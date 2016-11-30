@@ -1,0 +1,17 @@
+﻿namespace ONEbook.SpreadSheets.Models
+{
+    public interface Cell
+    {
+        int ColumnIndex { get; }
+
+        int RowIndex { get; }
+
+        object GetCellValue();
+
+        void SetCellValue(object value);
+
+        void SetCenterHorizontalAlignment();
+
+        void CopyTo(Cell targetCell);
+    }
+}
