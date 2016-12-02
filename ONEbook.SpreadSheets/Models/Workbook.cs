@@ -4,7 +4,7 @@
     {
         void Load(string templatePath);
 
-        void SetSheetName(int sheetIx, string name);
+        void SetSheetName(int index, string name);
 
         byte[] ToBytes();
 

@@ -70,13 +70,13 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="ExcelTemplates\Agent.xls">
+    <None Include="ExcelTemplates\MergeBodyCells.xls">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="ExcelTemplates\Master.xls">
+    <None Include="ExcelTemplates\MultipleTotalRows.xls">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="ExcelTemplates\Member.xls">
+    <None Include="ExcelTemplates\WinLossDetail.xls">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="packages.config" />

@@ -12,6 +12,6 @@
 
         void SetCenterHorizontalAlignment();
 
-        void CopyTo(Cell targetCell);
+        void CopyFrom(Cell cell);
     }
 }

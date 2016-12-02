@@ -1,8 +1,8 @@
 ﻿namespace ONEbook.SpreadSheets.NPOI.Models
 {
     using System.IO;
-    using SpreadSheets.Models;
     using global::NPOI.HSSF.UserModel;
+    using SpreadSheets.Models;
 
     public class NpoiWorkbook : Workbook
     {
@@ -31,9 +31,9 @@
             }
         }
 
-        public void SetSheetName(int sheetIx, string name)
+        public void SetSheetName(int index, string name)
         {
-            Workbook.SetSheetName(sheetIx, name);
+            Workbook.SetSheetName(index, name);
         }
 
         public byte[] ToBytes()

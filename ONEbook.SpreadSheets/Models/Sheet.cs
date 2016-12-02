@@ -12,6 +12,6 @@
 
         Cell GetCell(int rowIndex, int colIndex);
 
-        void CreateFreezePane(int colSplit, int rowSplit);
+        void CreateFreezePane(int colIndex, int rowIndex);
     }
 }

@@ -1,5 +1,7 @@
 ﻿namespace ONEbook.SpreadSheets.Models
 {
+    using System;
+
     public class SpreadSheetLayout
     {
         public SpreadSheetLayout(
@@ -64,6 +66,11 @@
 
         public Sheet LoadTemplateSheet(Workbook workbook)
         {
+            if (workbook == null)
+            {
+                throw new ArgumentNullException(nameof(workbook), "Workbook cannot be null");
+            }
+
             TemplateSheet = workbook.GetSheetAt(TemplateSheetIndex);
             OddRowTemplate = TemplateSheet.GetRow(OddRowTemplateIndex);
             EvenRowTemplate = TemplateSheet.GetRow(EvenRowTemplateIndex);

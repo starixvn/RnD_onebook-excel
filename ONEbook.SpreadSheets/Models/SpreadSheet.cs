@@ -1,24 +1,29 @@
 ﻿namespace ONEbook.SpreadSheets.Models
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
 
     public class SpreadSheet<T> where T : class
     {
         public SpreadSheet(
-            IEnumerable<T> dataSource,
-            T totalData,
+            IEnumerable<T> bodyRows,
+            Func<T, int, IDictionary<int, object>> rowMapping,
             string title,
             string sheetName,
             IDictionary<string, string> headerTexts,
-            SpreadSheetLayout spreadSheetLayout)
+            SpreadSheetLayout layout,
+            IEnumerable<T> footerRows = null,
+            Func<T, int, IDictionary<int, object>> footerRowMapping = null)
         {
-            DataSource = dataSource ?? Enumerable.Empty<T>();
-            TotalData = totalData;
+            BodyRows = bodyRows ?? Enumerable.Empty<T>();
+            FooterRows = footerRows ?? Enumerable.Empty<T>();
             Title = title;
             SheetName = sheetName;
             HeaderTexts = headerTexts;
-            Layout = spreadSheetLayout;
+            Layout = layout;
+            RowMapping = rowMapping;
+            FooterRowMapping = footerRowMapping ?? rowMapping;
         }
 
         public string Title { get; }
@@ -27,12 +32,16 @@
 
         public string SheetName { get; }
 
-        public IEnumerable<T> DataSource { get; }
+        public IEnumerable<T> BodyRows { get; }
 
-        public T TotalData { get; }
+        public IEnumerable<T> FooterRows { get; }
 
         public SpreadSheetLayout Layout { get; }
 
-        public bool Any() => DataSource.Any();
+        public Func<T, int, IDictionary<int, object>> RowMapping { get; }
+
+        public Func<T, int, IDictionary<int, object>> FooterRowMapping { get; }
+
+        public bool Any() => BodyRows.Any();
     }
 }

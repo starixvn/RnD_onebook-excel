@@ -8,15 +8,12 @@
 
     public class NpoiCell : Cell
     {
-        public NpoiCell(ICell cell, Sheet sheet)
+        public NpoiCell(ICell cell)
         {
             Cell = cell;
-            Sheet = sheet;
         }
 
         public ICell Cell { get; }
-
-        public Sheet Sheet { get; }
 
         public int ColumnIndex
         {
@@ -34,67 +31,69 @@
             }
         }
 
-        public void CopyTo(Cell targetCell)
+        public void CopyFrom(Cell cell)
         {
-            if (targetCell == null)
+            if (cell == null)
             {
                 throw new ArgumentNullException("targetCell");
             }
 
-            this.CopyMergeInfoTo(targetCell);
+            CopyMergeInfoFrom(cell);
 
-            var npoiTargetCell = targetCell as NpoiCell;
+            var npoiTargetCell = cell as NpoiCell;
 
-            npoiTargetCell.Cell.CellComment = Cell.CellComment ?? default(IComment);
-            npoiTargetCell.Cell.Hyperlink = Cell.Hyperlink ?? default(IHyperlink);
-            npoiTargetCell.Cell.CellStyle = Cell.CellStyle ?? default(ICellStyle);
+            Cell.CellComment = npoiTargetCell.Cell.CellComment ?? default(IComment);
+            Cell.Hyperlink = npoiTargetCell.Cell.Hyperlink ?? default(IHyperlink);
+            Cell.CellStyle = npoiTargetCell.Cell.CellStyle ?? default(ICellStyle);
 
-            npoiTargetCell.Cell.SetCellType(Cell.CellType);
+            Cell.SetCellType(npoiTargetCell.Cell.CellType);
 
-            switch (Cell.CellType)
+            switch (npoiTargetCell.Cell.CellType)
             {
                 case CellType.Boolean:
-                    npoiTargetCell.SetCellValue(Cell.BooleanCellValue);
+                    Cell.SetCellValue(npoiTargetCell.Cell.BooleanCellValue);
                     break;
 
                 case CellType.Numeric:
-                    npoiTargetCell.SetCellValue(Cell.NumericCellValue);
+                    Cell.SetCellValue(npoiTargetCell.Cell.NumericCellValue);
                     break;
 
                 case CellType.String:
-                    npoiTargetCell.SetCellValue(Cell.StringCellValue);
+                    Cell.SetCellValue(npoiTargetCell.Cell.StringCellValue);
                     break;
 
                 case CellType.Error:
-                    npoiTargetCell.SetCellValue(Cell.ErrorCellValue);
+                    Cell.SetCellValue(npoiTargetCell.Cell.ErrorCellValue);
                     break;
 
                 case CellType.Formula:
-                    npoiTargetCell.Cell.CellFormula = Cell.CellFormula;
+                    Cell.CellFormula = npoiTargetCell.Cell.CellFormula;
                     break;
             }
         }
 
-        public void CopyMergeInfoTo(Cell targetCell)
+        public void CopyMergeInfoFrom(Cell cell)
         {
-            if (!Cell.IsMergedCell)
+            var npoiCell = cell as NpoiCell;
+
+            if (npoiCell == null)
+            {
+                throw new InvalidCastException("NPOI Cell cannot be null");
+            }
+
+            if (!npoiCell.Cell.IsMergedCell)
             {
                 return;
             }
 
-            if (targetCell == null)
-            {
-                throw new ArgumentNullException("targetCell");
-            }
-
             CellRangeAddress sourceRange = null;
 
-            for (var i = 0; i < Cell.Sheet.NumMergedRegions; i++)
+            for (var regionIndex = 0; regionIndex < npoiCell.Cell.Sheet.NumMergedRegions; regionIndex++)
             {
-                CellRangeAddress range = Cell.Sheet.GetMergedRegion(i);
+                CellRangeAddress range = npoiCell.Cell.Sheet.GetMergedRegion(regionIndex);
 
-                if (range.FirstColumn == Cell.ColumnIndex
-                    && range.FirstRow == Cell.RowIndex)
+                if (range.FirstColumn == npoiCell.Cell.ColumnIndex
+                    && range.FirstRow == npoiCell.Cell.RowIndex)
                 {
                     sourceRange = range;
                     break;
@@ -104,14 +103,12 @@
             if (sourceRange != null)
             {
                 CellRangeAddress newRange = new CellRangeAddress(
-                    targetCell.RowIndex,
-                    targetCell.RowIndex + sourceRange.LastRow - sourceRange.FirstRow,
-                    targetCell.ColumnIndex,
-                    targetCell.ColumnIndex + sourceRange.LastColumn - sourceRange.FirstColumn);
+                    Cell.RowIndex,
+                    Cell.RowIndex + sourceRange.LastRow - sourceRange.FirstRow,
+                    Cell.ColumnIndex,
+                    Cell.ColumnIndex + sourceRange.LastColumn - sourceRange.FirstColumn);
 
-                var npoiCell = targetCell as NpoiCell;
-
-                npoiCell.Cell.Sheet.AddMergedRegion(newRange);
+                Cell.Sheet.AddMergedRegion(newRange);
             }
         }
 

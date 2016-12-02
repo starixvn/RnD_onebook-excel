@@ -26,21 +26,21 @@
             }
         }
 
-        public void CreateFreezePane(int colSplit, int rowSplit)
+        public void CreateFreezePane(int colIndex, int rowIndex)
         {
-            Sheet.CreateFreezePane(colSplit, rowSplit);
+            Sheet.CreateFreezePane(colIndex, rowIndex);
         }
 
         public Cell GetCell(int rowIndex, int colIndex)
         {
-            return new NpoiCell(Sheet.GetRow(rowIndex).GetCell(colIndex), this);
+            return new NpoiCell(Sheet.GetRow(rowIndex).GetCell(colIndex));
         }
 
         public Row GetRow(int rownum)
         {
             return Sheet.GetRow(rownum) == null
-                ? new NpoiRow(Sheet.CreateRow(rownum), this)
-                : new NpoiRow(Sheet.GetRow(rownum), this);
+                ? new NpoiRow(Sheet.CreateRow(rownum))
+                : new NpoiRow(Sheet.GetRow(rownum));
         }
 
         public void SetCellRangeValue(int firstRow, int firstCol, int lastRow, int lastCol, string value)

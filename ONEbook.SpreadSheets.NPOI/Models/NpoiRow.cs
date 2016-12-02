@@ -2,73 +2,58 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
     using global::NPOI.SS.UserModel;
     using SpreadSheets.Models;
 
     public class NpoiRow : Row
     {
-        public NpoiRow(IRow row, Sheet sheet)
+        public NpoiRow(IRow row)
         {
             Row = row;
-            Sheet = sheet;
         }
 
         public IRow Row { get; }
 
-        public Sheet Sheet { get; }
+        public short FirstCellIndex => Row.FirstCellNum;
 
-        public short FirstCellNum => Row.FirstCellNum;
+        public short LastCellIndex => Row.LastCellNum;
 
-        public short Height
+        public void CopyCellsFrom(Row row)
         {
-            get
-            {
-                return Row.Height;
-            }
-
-            set
-            {
-                Row.Height = value;
-            }
-        }
-
-        public short LastCellNum => Row.LastCellNum;
-
-        public void CopyCellsTo(Row targetRow)
-        {
-            if (targetRow == null)
+            if (row == null)
             {
                 throw new ArgumentNullException("targetRow");
             }
 
-            var firstCellNum = FirstCellNum;
-            var lastCellNum = Math.Min(LastCellNum, int.MaxValue);
-
-            for (var i = firstCellNum; i < lastCellNum; i++)
+            for (var i = row.FirstCellIndex; i < row.LastCellIndex; i++)
             {
-                var sourceCell = GetCell(i);
+                var sourceCell = row.GetCell(i);
 
                 if (sourceCell == null)
                 {
                     continue;
                 }
 
-                var targetCell = targetRow.GetCell(i);
+                var cell = GetCell(i);
 
-                sourceCell.CopyTo(targetCell);
+                cell.CopyFrom(sourceCell);
             }
 
-            var npoiTargetRow = targetRow as NpoiRow;
+            var npoiRow = row as NpoiRow;
 
-            Row.Height = npoiTargetRow.Height;
+            if (npoiRow == null)
+            {
+                throw new InvalidCastException("NPOI Target Row cannot be null");
+            }
+
+            Row.Height = npoiRow.Row.Height;
         }
 
         public Cell GetCell(int cellnum)
         {
             return Row.GetCell(cellnum) == null
-                ? new NpoiCell(Row.CreateCell(cellnum), Sheet)
-                : new NpoiCell(Row.GetCell(cellnum), Sheet);
+                ? new NpoiCell(Row.CreateCell(cellnum))
+                : new NpoiCell(Row.GetCell(cellnum));
         }
 
         public void SetCellValue(int colIndex, object value)
@@ -77,21 +62,13 @@
             cell.SetCellValue(value);
         }
 
-        public void SetCellValues(int colIndex, IEnumerable<object> values)
-        {
-            SetCellValues(colIndex, values.ToArray());
-        }
-
-        public void SetCellValues(int colIndex, params object[] values)
-        {
-            foreach (var value in values)
-            {
-                SetCellValue(colIndex++, value);
-            }
-        }
-
         public void SetCellValues(IDictionary<int, object> values)
         {
+            if (values == null)
+            {
+                throw new ArgumentNullException(nameof(values), "Cell Values cannot be null");
+            }
+
             foreach (var value in values)
             {
                 SetCellValue(value.Key, value.Value);

@@ -9,6 +9,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ONEbook.SpreadSheets.Demo",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ONEbook.SpreadSheets.NPOI", "ONEbook.SpreadSheets.NPOI\ONEbook.SpreadSheets.NPOI.csproj", "{3C67C2C1-FE67-455D-A989-0A1DC9D86740}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{972F6196-A023-4E4D-9097-1EF99C6003FE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ONEbook.SpreadSheets.Tests", "ONEbook.SpreadSheets.Tests\ONEbook.SpreadSheets.Tests.csproj", "{AE39F749-89C6-4E02-AE97-39C8E8D543A5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,8 +31,15 @@ Global
 		{3C67C2C1-FE67-455D-A989-0A1DC9D86740}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3C67C2C1-FE67-455D-A989-0A1DC9D86740}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3C67C2C1-FE67-455D-A989-0A1DC9D86740}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AE39F749-89C6-4E02-AE97-39C8E8D543A5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AE39F749-89C6-4E02-AE97-39C8E8D543A5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AE39F749-89C6-4E02-AE97-39C8E8D543A5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AE39F749-89C6-4E02-AE97-39C8E8D543A5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{AE39F749-89C6-4E02-AE97-39C8E8D543A5} = {972F6196-A023-4E4D-9097-1EF99C6003FE}
 	EndGlobalSection
 EndGlobal

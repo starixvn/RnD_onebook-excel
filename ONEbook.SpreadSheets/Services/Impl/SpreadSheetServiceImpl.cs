@@ -9,9 +9,7 @@
     {
         public virtual byte[] Export<T>(
             SpreadSheet<T> spreadSheet,
-            Workbook workbook,
-            Func<T, int, IDictionary<int, object>> rowMapping,
-            Func<T, int, IDictionary<int, object>> totalRowMapping = null) where T : class
+            Workbook workbook) where T : class
         {
             if (spreadSheet == null)
             {
@@ -43,7 +41,7 @@
                 spreadSheet.Layout.BodyStartIndex - 1,
                 spreadSheet.HeaderTexts);
 
-            resultSheet = RenderBody(resultSheet, spreadSheet, rowMapping, totalRowMapping);
+            resultSheet = RenderBody(resultSheet, spreadSheet);
 
             resultSheet = RenderFreePanel(resultSheet, layout.FreezeRowIndex, layout.FreezeColumnIndex);
 
@@ -53,77 +51,136 @@
         }
 
         protected virtual Sheet RenderHeader(
-            Sheet sheet,
+            Sheet resultSheet,
             Sheet templateSheet,
             int headerStartIndex,
             int headerEndIndex,
             IDictionary<string, string> headerTexts)
         {
+            if (resultSheet == null)
+            {
+                throw new ArgumentNullException(nameof(resultSheet), "Result Sheet cannot be null");
+            }
+
+            if (templateSheet == null)
+            {
+                throw new ArgumentNullException(nameof(templateSheet), "Template Sheet cannot be null");
+            }
+
             if (headerStartIndex <= headerEndIndex)
             {
-                for (int i = headerStartIndex; i <= headerEndIndex; i++)
+                for (int rowIndex = headerStartIndex; rowIndex <= headerEndIndex; rowIndex++)
                 {
-                    var row = sheet.GetRow(i);
-                    var templateRow = templateSheet.GetRow(i);
+                    var row = resultSheet.GetRow(rowIndex);
+                    var templateRow = templateSheet.GetRow(rowIndex);
 
-                    templateRow.CopyCellsTo(row);
+                    row.CopyCellsFrom(templateRow);
 
-                    for (int j = templateRow.FirstCellNum; j < templateRow.LastCellNum; j++)
+                    for (int colIndex = templateRow.FirstCellIndex; colIndex < templateRow.LastCellIndex; colIndex++)
                     {
-                        var templateCell = templateRow.GetCell(j);
+                        var templateCell = templateRow.GetCell(colIndex);
                         var resourceKey = templateCell.GetCellValue();
 
                         if (headerTexts.ContainsKey(resourceKey.ToString()))
                         {
-                            var currentCell = row.GetCell(j);
-                            currentCell.SetCellValue(headerTexts[resourceKey.ToString()]);
+                            row.SetCellValue(colIndex, headerTexts[resourceKey.ToString()]);
                         }
                     }
                 }
             }
 
-            return sheet;
+            return resultSheet;
         }
 
         protected virtual Sheet RenderBody<T>(
             Sheet sheet,
-            SpreadSheet<T> spreadSheet,
-            Func<T, int, IDictionary<int, object>> rowMapping,
-            Func<T, int, IDictionary<int, object>> totalRowMapping = null) where T : class
+            SpreadSheet<T> spreadSheet) where T : class
         {
+            if (sheet == null)
+            {
+                throw new ArgumentNullException(nameof(sheet), "Sheet cannot be null");
+            }
+
+            if (spreadSheet == null)
+            {
+                throw new ArgumentNullException(nameof(spreadSheet), "Spread Sheet cannot be null");
+            }
+
             var layout = spreadSheet.Layout;
             var rowIndex = layout.BodyStartIndex;
             var columnStartIndex = layout.ColumnStartIndex;
-            var dataSource = spreadSheet.DataSource;
 
             if (spreadSheet.Any())
             {
-                var isEven = false;
-                var dataLength = dataSource.Count();
+                rowIndex = RenderBodyRows(sheet, layout, spreadSheet.BodyRows, rowIndex, spreadSheet.RowMapping);
 
-                for (var i = 0; i < dataLength; i++, rowIndex++)
-                {
-                    FillRow(
-                        sheet.GetRow(rowIndex),
-                        dataSource.ElementAt(i),
-                        i,
-                        rowMapping,
-                        isEven ? layout.EvenRowTemplate : layout.OddRowTemplate);
-                    isEven = !isEven;
-                }
-
-                sheet = RenderTotalRows(sheet, spreadSheet, rowIndex, totalRowMapping ?? rowMapping);
+                sheet = RenderTotalRows(sheet, layout.TemplateSheet, spreadSheet.FooterRows, layout.TotalRowTemplateIndex, rowIndex, spreadSheet.FooterRowMapping);
             }
             else
             {
-                sheet.SetCellRangeValue(
-                    rowIndex,
-                    columnStartIndex,
-                    rowIndex,
-                    columnStartIndex + layout.OddRowTemplate.LastCellNum - 1,
-                    layout.NoInfomationText);
-                sheet.GetCell(rowIndex, columnStartIndex).SetCenterHorizontalAlignment();
+                sheet = RenderNoInfoRow(sheet, rowIndex, columnStartIndex, layout);
             }
+
+            return sheet;
+        }
+
+        protected virtual int RenderBodyRows<T>(
+            Sheet sheet,
+            SpreadSheetLayout layout,
+            IEnumerable<T> bodyRows,
+            int rowIndex,
+            Func<T, int, IDictionary<int, object>> rowMapping) where T : class
+        {
+            if (sheet == null)
+            {
+                throw new ArgumentNullException(nameof(sheet), "Sheet cannot be null");
+            }
+
+            if (layout == null)
+            {
+                throw new ArgumentNullException(nameof(layout), "Layout cannot be null");
+            }
+
+            var isEven = false;
+            var dataLength = bodyRows.Count();
+
+            for (var dataIndex = 0; dataIndex < dataLength; dataIndex++, rowIndex++)
+            {
+                var row = sheet.GetRow(rowIndex);
+                var templateRow = isEven ? layout.EvenRowTemplate : layout.OddRowTemplate;
+
+                row.CopyCellsFrom(templateRow);
+                row.SetCellValues(rowMapping(bodyRows.ElementAt(dataIndex), rowIndex));
+                isEven = !isEven;
+            }
+
+            return rowIndex;
+        }
+
+        protected virtual Sheet RenderNoInfoRow(
+            Sheet sheet,
+            int rowIndex,
+            int colIndex,
+            SpreadSheetLayout layout)
+        {
+            if (sheet == null)
+            {
+                throw new ArgumentNullException(nameof(sheet), "Sheet cannot be null");
+            }
+
+            if (layout == null)
+            {
+                throw new ArgumentNullException(nameof(layout), "Layout cannot be null");
+            }
+
+            sheet.SetCellRangeValue(
+                    rowIndex,
+                    colIndex,
+                    rowIndex,
+                    layout.OddRowTemplate.LastCellIndex - 1,
+                    layout.NoInfomationText);
+
+            sheet.GetCell(rowIndex, colIndex).SetCenterHorizontalAlignment();
 
             return sheet;
         }
@@ -135,29 +192,24 @@
             int titleRowIndex,
             string title)
         {
+            if (resultSheet == null)
+            {
+                throw new ArgumentNullException(nameof(resultSheet), "Result Sheet cannot be null");
+            }
+
+            if (templateSheet == null)
+            {
+                throw new ArgumentNullException(nameof(templateSheet), "Template Sheet cannot be null");
+            }
+
             var titleRow = resultSheet.GetRow(titleRowIndex);
             var templateTitleRow = templateSheet.GetRow(titleRowIndex);
 
-            templateTitleRow.CopyCellsTo(titleRow);
+            titleRow.CopyCellsFrom(templateTitleRow);
 
             resultSheet.SetCellValue(titleRowIndex, titleColIndex, title);
 
             return resultSheet;
-        }
-
-        protected virtual Row FillRow<T>(
-            Row row,
-            T genericData,
-            int dataIndex,
-            Func<T, int, IDictionary<int, object>> rowMapping,
-            Row template)
-        {
-            var rowTemplate = template;
-            rowTemplate.CopyCellsTo(row);
-
-            row.SetCellValues(rowMapping(genericData, dataIndex));
-
-            return row;
         }
 
         protected virtual Sheet RenderFreePanel(Sheet sheet, int freezeRowIndex, int freeColumnIndex)
@@ -171,24 +223,40 @@
         }
 
         protected virtual Sheet RenderTotalRows<T>(
-            Sheet sheet,
-            SpreadSheet<T> spreadSheet,
+            Sheet resultSheet,
+            Sheet templateSheet,
+            IEnumerable<T> totalData,
+            int templateRowIndex,
             int rowIndex,
             Func<T, int, IDictionary<int, object>> rowMapping) where T : class
         {
-            if (spreadSheet.TotalData == null)
+            if (!totalData.Any())
             {
-                return sheet;
+                return resultSheet;
             }
 
-            var layout = spreadSheet.Layout;
-            var row = sheet.GetRow(rowIndex);
+            if (resultSheet == null)
+            {
+                throw new ArgumentNullException(nameof(resultSheet), "Result Sheet cannot be null");
+            }
 
-            layout.TotalRowTemplate.CopyCellsTo(row);
+            if (templateSheet == null)
+            {
+                throw new ArgumentNullException(nameof(templateSheet), "Template Sheet cannot be null");
+            }
 
-            row.SetCellValues(rowMapping(spreadSheet.TotalData, rowIndex));
+            var dataLength = totalData.Count();
 
-            return sheet;
+            for (var dataIndex = 0; dataIndex < dataLength; dataIndex++, rowIndex++, templateRowIndex++)
+            {
+                var row = resultSheet.GetRow(rowIndex);
+                var templateRow = templateSheet.GetRow(templateRowIndex);
+
+                row.CopyCellsFrom(templateRow);
+                row.SetCellValues(rowMapping(totalData.ElementAt(dataIndex), rowIndex));
+            }
+
+            return resultSheet;
         }
     }
 }

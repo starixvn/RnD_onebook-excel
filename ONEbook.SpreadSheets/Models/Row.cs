@@ -4,15 +4,13 @@
 
     public interface Row
     {
-        short FirstCellNum { get; }
+        short FirstCellIndex { get; }
 
-        short LastCellNum { get; }
+        short LastCellIndex { get; }
 
-        void CopyCellsTo(Row targetRow);
+        void CopyCellsFrom(Row row);
 
         void SetCellValues(IDictionary<int, object> values);
-
-        void SetCellValues(int colIndex, IEnumerable<object> values);
 
         void SetCellValue(int colIndex, object value);
 

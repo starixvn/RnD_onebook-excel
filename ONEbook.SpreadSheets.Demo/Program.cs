@@ -13,60 +13,138 @@ namespace ONEbook.SpreadSheets.Demo
     {
         private static void Main()
         {
-            Workbook workbook = new NpoiWorkbook(@"ExcelTemplates\Master.xls");
-
             var spreadSheetService = new SpreadSheetServiceImpl();
-            var headerTexts = GetHeaderTexts();
 
+            ExportWinLossDetail(spreadSheetService);
+            ExportWinLossDetailNoData(spreadSheetService);
+            ExportWithMultipleFooterRows(spreadSheetService);
+            ExportWithMergeCells(spreadSheetService);
+        }
+
+        private static void ExportWithMergeCells(SpreadSheetServiceImpl spreadSheetService)
+        {
+            Workbook workbook = new NpoiWorkbook(@"ExcelTemplates\MergeBodyCells.xls");
             var spreadSheet = new SpreadSheet<WinLossDetail>(
-                GenerateData(),
-                new WinLossDetail(10, "total", 10, 30, 20, 40, new NetWinLoss(20.23m, 4), new NetWinLoss(5, 6), new NetWinLoss(7, 80.23m), new NetWinLoss(80.23m, 9)),
-                "Demo title",
-                "My Sheet Name",
-                headerTexts,
-                new SpreadSheetLayout(
-                0,
-                1,
-                3,
-                3,
-                1));
+                            GenerateDummyData(),
+                            BodyRowMapping,
+                            "Demo title",
+                            "My Sheet Name",
+                            GetDummyHeaderTexts(),
+                            new SpreadSheetLayout(
+                            0,
+                            1,
+                            3,
+                            3,
+                            1),
+                            new List<WinLossDetail>
+                            {
+                                new WinLossDetail(10, "total", 10, 30, 20, 40, new NetWinLoss(20.23m, 4), new NetWinLoss(5, 6), new NetWinLoss(7, 80.23m), new NetWinLoss(80.23m, 9)),
+                                new WinLossDetail(101, "total2", 10, 30, 20, 410, new NetWinLoss(20.213m, 4), new NetWinLoss(51, 6), new NetWinLoss(7, 80.213m), new NetWinLoss(810.23m, 9)),
+                                new WinLossDetail(101, "total3", 10, 301, 20, 410, new NetWinLoss(20.213m, 4), new NetWinLoss(511, 6), new NetWinLoss(71, 80.213m), new NetWinLoss(810.23m, 9))
+                            },
+                            FooterRowMapping);
 
             var exportStream = spreadSheetService.Export(
                 spreadSheet,
-                workbook,
-                BodyRowMapping,
-                TotalRowMapping);
+                workbook);
 
-            SaveFile(exportStream);
+            SaveFile(exportStream, "MergeBodyCells.xls");
+        }
 
-            Workbook noDataWorkbook = new NpoiWorkbook(@"ExcelTemplates\Master.xls");
+        private static void ExportWithMultipleFooterRows(SpreadSheetServiceImpl spreadSheetService)
+        {
+            Workbook workbook = new NpoiWorkbook(@"ExcelTemplates\MultipleTotalRows.xls");
+            var spreadSheet = new SpreadSheet<WinLossDetail>(
+                            GenerateDummyData(),
+                            BodyRowMapping,
+                            "Demo title",
+                            "My Sheet Name",
+                            GetDummyHeaderTexts(),
+                            new SpreadSheetLayout(
+                            0,
+                            1,
+                            3,
+                            3,
+                            1),
+                            new List<WinLossDetail>
+                            {
+                                new WinLossDetail(10, "total", 10, 30, 20, 40, new NetWinLoss(20.23m, 4), new NetWinLoss(5, 6), new NetWinLoss(7, 80.23m), new NetWinLoss(80.23m, 9)),
+                                new WinLossDetail(101, "total2", 10, 30, 20, 410, new NetWinLoss(20.213m, 4), new NetWinLoss(51, 6), new NetWinLoss(7, 80.213m), new NetWinLoss(810.23m, 9)),
+                                new WinLossDetail(101, "total3", 10, 301, 20, 410, new NetWinLoss(20.213m, 4), new NetWinLoss(511, 6), new NetWinLoss(71, 80.213m), new NetWinLoss(810.23m, 9))
+                            },
+                            FooterRowMapping);
+
+            var exportStream = spreadSheetService.Export(
+                spreadSheet,
+                workbook);
+
+            SaveFile(exportStream, "MultipleTotalRows.xls");
+        }
+
+        private static void ExportWinLossDetail(SpreadSheetServiceImpl spreadSheetService)
+        {
+            Workbook workbook = new NpoiWorkbook(@"ExcelTemplates\WinLossDetail.xls");
+            var spreadSheet = new SpreadSheet<WinLossDetail>(
+                            GenerateDummyData(),
+                            BodyRowMapping,
+                            "Demo title",
+                            "My Sheet Name",
+                            GetDummyHeaderTexts(),
+                            new SpreadSheetLayout(
+                            0,
+                            1,
+                            3,
+                            3,
+                            1),
+                            new List<WinLossDetail> { new WinLossDetail(10, "total", 10, 30, 20, 40, new NetWinLoss(20.23m, 4), new NetWinLoss(5, 6), new NetWinLoss(7, 80.23m), new NetWinLoss(80.23m, 9)) },
+                            FooterRowMapping);
+
+            var exportStream = spreadSheetService.Export(
+                spreadSheet,
+                workbook);
+
+            SaveFile(exportStream, "WinLossDetail.xls");
+        }
+
+        private static void ExportWinLossDetailNoData(SpreadSheetServiceImpl spreadSheetService)
+        {
+            Workbook noDataWorkbook = new NpoiWorkbook(@"ExcelTemplates\WinLossDetail.xls");
 
             var noDataSpreadSheet = new SpreadSheet<WinLossDetail>(
                 Enumerable.Empty<WinLossDetail>(),
-                new WinLossDetail(10, "total", 10, 30, 20, 40, new NetWinLoss(20.23m, 4), new NetWinLoss(5, 6), new NetWinLoss(7, 80.23m), new NetWinLoss(80.23m, 9)),
+                BodyRowMapping,
                 "Demo title Demo titleDemo titleDemo titleDemo titleDemo titleDemo titleDemo title",
                 "My Sheet Name",
-                headerTexts,
+                GetDummyHeaderTexts(),
                 new SpreadSheetLayout(
                 0,
                 1,
                 3,
                 3,
-                1));
+                1),
+                new List<WinLossDetail> { new WinLossDetail(10, "total", 10, 30, 20, 40, new NetWinLoss(20.23m, 4), new NetWinLoss(5, 6), new NetWinLoss(7, 80.23m), new NetWinLoss(80.23m, 9)) },
+                FooterRowMapping);
 
             var noSpreadSheetlExportStream = spreadSheetService.Export(
                 noDataSpreadSheet,
-                noDataWorkbook,
-                BodyRowMapping,
-                TotalRowMapping);
+                noDataWorkbook);
 
-            SaveFile(noSpreadSheetlExportStream, "nodata.xls");
+            SaveFile(noSpreadSheetlExportStream, "WinLossDetail-NoData.xls");
         }
 
         private static IDictionary<int, object> BodyRowMapping(WinLossDetail data, int rowIndex)
         {
             return new Dictionary<int, object>
                     {
+                        { 9, data.AgentNetWinLoss.Comm },
+                        { 10, data.AgentNetWinLoss.Total },
+                        { 11, data.MasterNetWinLoss.WinLoss },
+                        { 12, data.MasterNetWinLoss.Comm },
+                        { 13, data.MasterNetWinLoss.Total },
+                        { 14, data.SuperNetWinLoss.WinLoss },
+                        { 15, data.SuperNetWinLoss.Comm },
+                        { 16, data.SuperNetWinLoss.Total },
+                        { 17, data.Company },
                         { 0, data.CustName },
                         { 1, data.NumberOfTickets },
                         { 2, data.Turnover },
@@ -76,19 +154,10 @@ namespace ONEbook.SpreadSheets.Demo
                         { 6, data.MemberNetWinLoss.Comm },
                         { 7, data.MemberNetWinLoss.Total },
                         { 8, data.AgentNetWinLoss.WinLoss },
-                        { 9, data.AgentNetWinLoss.Comm },
-                        { 10, data.AgentNetWinLoss.Total },
-                        { 11, data.MasterNetWinLoss.WinLoss },
-                        { 12, data.MasterNetWinLoss.Comm },
-                        { 13, data.MasterNetWinLoss.Total },
-                        { 14, data.SuperNetWinLoss.WinLoss },
-                        { 15, data.SuperNetWinLoss.Comm },
-                        { 16, data.SuperNetWinLoss.Total },
-                        { 17, data.Company }
                     };
         }
 
-        private static IDictionary<int, object> TotalRowMapping(WinLossDetail data, int rowIndex)
+        private static IDictionary<int, object> FooterRowMapping(WinLossDetail data, int rowIndex)
         {
             return new Dictionary<int, object>
                     {
@@ -113,7 +182,7 @@ namespace ONEbook.SpreadSheets.Demo
                     };
         }
 
-        private static Dictionary<string, string> GetHeaderTexts()
+        private static Dictionary<string, string> GetDummyHeaderTexts()
         {
             return new Dictionary<string, string>
                 {
@@ -141,7 +210,7 @@ namespace ONEbook.SpreadSheets.Demo
                 };
         }
 
-        private static IEnumerable<WinLossDetail> GenerateData()
+        private static IEnumerable<WinLossDetail> GenerateDummyData()
         {
             return new List<WinLossDetail>
             {
