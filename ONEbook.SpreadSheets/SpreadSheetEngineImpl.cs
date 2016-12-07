@@ -1,12 +1,15 @@
-﻿namespace ONEbook.SpreadSheets.Services.Impl
+﻿namespace ONEbook.SpreadSheets
 {
     using System;
+    using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Linq;
     using Models;
 
-    public class SpreadSheetServiceImpl : SpreadSheetService
+    public class SpreadSheetEngineImpl : SpreadSheetEngine
     {
+        static readonly ConcurrentDictionary<string, int> columnNameToIndex = new ConcurrentDictionary<string, int>();
+
         public virtual byte[] Export<T>(
             SpreadSheet<T> spreadSheet,
             Workbook workbook) where T : class
@@ -36,14 +39,13 @@
 
             resultSheet = RenderHeader(
                 resultSheet,
-                templateSheet,
                 spreadSheet.Layout.HeaderStartIndex,
                 spreadSheet.Layout.BodyStartIndex - 1,
                 spreadSheet.HeaderTexts);
 
             resultSheet = RenderBody(resultSheet, spreadSheet);
 
-            resultSheet = RenderFreePanel(resultSheet, layout.FreezeRowIndex, layout.FreezeColumnIndex);
+            resultSheet = RenderFreePanel(resultSheet, layout.FreezeRowIndex, layout.FreezeColumnName);
 
             workbook.RemoveSheetAt(layout.TemplateSheetIndex);
 
@@ -52,7 +54,6 @@
 
         protected virtual Sheet RenderHeader(
             Sheet resultSheet,
-            Sheet templateSheet,
             int headerStartIndex,
             int headerEndIndex,
             IDictionary<string, string> headerTexts)
@@ -62,24 +63,15 @@
                 throw new ArgumentNullException(nameof(resultSheet), "Result Sheet cannot be null");
             }
 
-            if (templateSheet == null)
-            {
-                throw new ArgumentNullException(nameof(templateSheet), "Template Sheet cannot be null");
-            }
-
             if (headerStartIndex <= headerEndIndex)
             {
                 for (int rowIndex = headerStartIndex; rowIndex <= headerEndIndex; rowIndex++)
                 {
                     var row = resultSheet.GetRow(rowIndex);
-                    var templateRow = templateSheet.GetRow(rowIndex);
 
-                    row.CopyCellsFrom(templateRow);
-
-                    for (int colIndex = templateRow.FirstCellIndex; colIndex < templateRow.LastCellIndex; colIndex++)
+                    for (int colIndex = row.FirstCellIndex; colIndex < row.LastCellIndex; colIndex++)
                     {
-                        var templateCell = templateRow.GetCell(colIndex);
-                        var resourceKey = templateCell.GetCellValue();
+                        var resourceKey = row.GetCell(colIndex).GetCellValue();
 
                         if (headerTexts.ContainsKey(resourceKey.ToString()))
                         {
@@ -129,7 +121,7 @@
             SpreadSheetLayout layout,
             IEnumerable<T> bodyRows,
             int rowIndex,
-            Func<T, int, IDictionary<int, object>> rowMapping) where T : class
+            Func<T, int, IDictionary<string, object>> rowMapping) where T : class
         {
             if (sheet == null)
             {
@@ -148,9 +140,10 @@
             {
                 var row = sheet.GetRow(rowIndex);
                 var templateRow = isEven ? layout.EvenRowTemplate : layout.OddRowTemplate;
+                var cellValuesWithColumnName = rowMapping(bodyRows.ElementAt(dataIndex), rowIndex);
 
                 row.CopyCellsFrom(templateRow);
-                row.SetCellValues(rowMapping(bodyRows.ElementAt(dataIndex), rowIndex));
+                row.SetCellValues(ConvertColumnNameToIndex(cellValuesWithColumnName));
                 isEven = !isEven;
             }
 
@@ -212,8 +205,9 @@
             return resultSheet;
         }
 
-        protected virtual Sheet RenderFreePanel(Sheet sheet, int freezeRowIndex, int freeColumnIndex)
+        protected virtual Sheet RenderFreePanel(Sheet sheet, int freezeRowIndex, string freeColumnName)
         {
+            var freeColumnIndex = string.IsNullOrWhiteSpace(freeColumnName) ? 0 : GetColIndex(freeColumnName);
             if (freeColumnIndex > 0 || freezeRowIndex > 0)
             {
                 sheet.CreateFreezePane(freeColumnIndex, freezeRowIndex);
@@ -228,7 +222,7 @@
             IEnumerable<T> totalData,
             int templateRowIndex,
             int rowIndex,
-            Func<T, int, IDictionary<int, object>> rowMapping) where T : class
+            Func<T, int, IDictionary<string, object>> rowMapping) where T : class
         {
             if (!totalData.Any())
             {
@@ -251,12 +245,48 @@
             {
                 var row = resultSheet.GetRow(rowIndex);
                 var templateRow = templateSheet.GetRow(templateRowIndex);
+                var cellValuesWithColumnName = rowMapping(totalData.ElementAt(dataIndex), rowIndex);
 
                 row.CopyCellsFrom(templateRow);
-                row.SetCellValues(rowMapping(totalData.ElementAt(dataIndex), rowIndex));
+                row.SetCellValues(ConvertColumnNameToIndex(cellValuesWithColumnName));
             }
 
             return resultSheet;
         }
+
+        private int GetColIndex(string colName)
+        {
+            if(columnNameToIndex.ContainsKey(colName))
+            {
+                return columnNameToIndex[colName];
+            }
+
+            int colIndex = 0;
+            int pow = 1;
+            for (int i = colName.Length - 1; i >= 0; i--)
+            {
+                colIndex += (colName[i] - 'A') * pow;
+                pow *= 26;
+            }
+
+            if(!columnNameToIndex.ContainsKey(colName))
+            {
+                columnNameToIndex.TryAdd(colName, colIndex);
+            }
+
+            return colIndex;
+        }
+
+        private IDictionary<int, object> ConvertColumnNameToIndex(IDictionary<string, object> cellValuesWithColumnName)
+        {
+            var columnValuesWithIndex = new Dictionary<int, object>();
+            foreach (var cellValue in cellValuesWithColumnName)
+            {
+                columnValuesWithIndex.Add(GetColIndex(cellValue.Key), cellValue.Value);
+            }
+
+            return columnValuesWithIndex;
+        }
+
     }
 }

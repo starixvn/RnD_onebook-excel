@@ -5,64 +5,64 @@
     public class SpreadSheetLayout
     {
         public SpreadSheetLayout(
-            int titleIndex = 0,
-            int headerStartIndex = 1,
-            int bodyStartIndex = 3,
+            int titleIndex = 1,
+            int headerStartIndex = 2,
+            int bodyStartIndex = 4,
             int freezeRowIndex = 0,
-            int freezeColumnIndex = 0,
-            int columnStartIndex = 0,
-            int resultSheetIndex = 0,
-            int templateSheetIndex = 1,
-            int oddRowTemplateIndex = 3,
-            int evenRowTemplateIndex = 4,
-            int totalRowTemplateIndex = 5,
+            string freezeColumnName = "",
+            int columnStartIndex = 1,
+            int resultSheetIndex = 1,
+            int templateSheetIndex = 2,
+            int oddRowTemplateIndex = 4,
+            int evenRowTemplateIndex = 5,
+            int totalRowTemplateIndex = 6,
             string noInfomationText = "No information available.")
         {
-            FreezeRowIndex = freezeRowIndex;
-            FreezeColumnIndex = freezeColumnIndex;
-            HeaderStartIndex = headerStartIndex;
-            BodyStartIndex = bodyStartIndex;
-            TitleIndex = titleIndex;
-            ColumnStartIndex = columnStartIndex;
-            ResultSheetIndex = resultSheetIndex;
-            OddRowTemplateIndex = oddRowTemplateIndex;
-            EvenRowTemplateIndex = evenRowTemplateIndex;
-            TotalRowTemplateIndex = totalRowTemplateIndex;
-            TemplateSheetIndex = templateSheetIndex;
+            FreezeRowIndex = freezeRowIndex - 1;
+            FreezeColumnName = freezeColumnName;
+            HeaderStartIndex = headerStartIndex - 1;
+            BodyStartIndex = bodyStartIndex - 1;
+            TitleIndex = titleIndex - 1;
+            ColumnStartIndex = columnStartIndex - 1;
+            ResultSheetIndex = resultSheetIndex - 1;
+            OddRowTemplateIndex = oddRowTemplateIndex - 1;
+            EvenRowTemplateIndex = evenRowTemplateIndex - 1;
+            TotalRowTemplateIndex = totalRowTemplateIndex - 1;
+            TemplateSheetIndex = templateSheetIndex - 1;
             NoInfomationText = noInfomationText;
         }
 
-        public int ResultSheetIndex { get; }
+        public int ResultSheetIndex { get; protected set; }
 
-        public int TemplateSheetIndex { get; }
+        public int TemplateSheetIndex { get; protected set; }
 
-        public int TitleIndex { get; }
+        public int TitleIndex { get; protected set; }
 
-        public int ColumnStartIndex { get; }
+        public int ColumnStartIndex { get; protected set; }
 
-        public int HeaderStartIndex { get; }
+        public int HeaderStartIndex { get; protected set; }
 
-        public int BodyStartIndex { get; }
+        public int BodyStartIndex { get; protected set; }
 
-        public int FreezeRowIndex { get; }
+        public int FreezeRowIndex { get; protected set; }
 
-        public int FreezeColumnIndex { get; }
+        public string FreezeColumnName { get; protected set; }
 
-        public int OddRowTemplateIndex { get; }
+        public int OddRowTemplateIndex { get; protected set; }
 
-        public int EvenRowTemplateIndex { get; }
+        public int EvenRowTemplateIndex { get; protected set; }
 
-        public int TotalRowTemplateIndex { get; }
+        public int TotalRowTemplateIndex { get; protected set; }
 
-        public Row EvenRowTemplate { get; private set; }
+        public Row EvenRowTemplate { get; protected set; }
 
-        public Row OddRowTemplate { get; private set; }
+        public Row OddRowTemplate { get; protected set; }
 
-        public Row TotalRowTemplate { get; private set; }
+        public Row TotalRowTemplate { get; protected set; }
 
-        public Sheet TemplateSheet { get; private set; }
+        public Sheet TemplateSheet { get; protected set; }
 
-        public string NoInfomationText { get; }
+        public string NoInfomationText { get; protected set; }
 
         public Sheet LoadTemplateSheet(Workbook workbook)
         {
@@ -77,6 +77,62 @@
             TotalRowTemplate = TemplateSheet.GetRow(TotalRowTemplateIndex);
 
             return TemplateSheet;
+        }
+
+        public SpreadSheetLayout SetTitleIndex(int titleIndex)
+        {
+            TitleIndex = titleIndex - 1;
+
+            return this;
+        }
+
+        public SpreadSheetLayout SetSheetIndex(
+            int resultSheetIndex, 
+            int templateSheetIndex)
+        {
+            ResultSheetIndex = resultSheetIndex - 1;
+            TemplateSheetIndex = templateSheetIndex - 1;
+
+            return this;
+        }
+
+        public SpreadSheetLayout SetFreezePanel(
+            int freezeRowIndex, 
+            string freezeColumnName)
+        {
+            FreezeColumnName = freezeColumnName;
+            FreezeRowIndex = freezeRowIndex - 1;
+
+            return this;
+        }
+
+        public SpreadSheetLayout SetRowsIndex(
+            int headerStartIndex = 2, 
+            int bodyStartIndex = 4)
+        {
+            HeaderStartIndex = headerStartIndex - 1;
+            BodyStartIndex = bodyStartIndex - 1;
+
+            return this;
+        }
+
+        public SpreadSheetLayout SetTemplateRowsIndex(
+            int oddRowTemplateIndex = 4, 
+            int evenRowTemplateIndex = 5, 
+            int totalRowTemplateIndex = 6)
+        {
+            OddRowTemplateIndex = oddRowTemplateIndex - 1;
+            EvenRowTemplateIndex = evenRowTemplateIndex - 1;
+            TotalRowTemplateIndex = totalRowTemplateIndex - 1;
+
+            return this;
+        }
+
+        public SpreadSheetLayout SetNoInformationText(string noInformationText)
+        {
+            NoInfomationText = noInformationText;
+
+            return this;
         }
     }
 }
