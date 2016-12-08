@@ -2,7 +2,7 @@
 {
     public interface Workbook
     {
-        void Load(string templatePath);
+        Workbook Load(string templatePath);
 
         void SetSheetName(int index, string name);
 

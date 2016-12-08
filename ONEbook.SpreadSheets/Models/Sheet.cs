@@ -2,7 +2,7 @@
 {
     public interface Sheet
     {
-        Row GetRow(int rownum);
+        Row GetRow(int rowIndex);
 
         void AppendRows(int destinateRowIndex);
 
@@ -13,5 +13,7 @@
         Cell GetCell(int rowIndex, int colIndex);
 
         void CreateFreezePane(int colIndex, int rowIndex);
+
+        void RemoveRow(Row row);
     }
 }

@@ -11,9 +11,8 @@
             Workbook = workbook;
         }
 
-        public NpoiWorkbook(string templatePath)
+        public NpoiWorkbook()
         {
-            Load(templatePath);
         }
 
         public HSSFWorkbook Workbook { get; private set; }
@@ -23,12 +22,14 @@
             return new NpoiSheet(Workbook.GetSheetAt(sheetIndex));
         }
 
-        public void Load(string templatePath)
+        public Workbook Load(string templatePath)
         {
             using (FileStream file = new FileStream(templatePath, FileMode.Open, FileAccess.Read))
             {
                 Workbook = new HSSFWorkbook(file);
             }
+
+            return this;
         }
 
         public void SetSheetName(int index, string name)

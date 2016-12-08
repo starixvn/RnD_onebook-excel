@@ -76,6 +76,9 @@
     <None Include="ExcelTemplates\MultipleTotalRows.xls">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="ExcelTemplates\NoTotalRow.xls">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="ExcelTemplates\WinLossDetail.xls">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

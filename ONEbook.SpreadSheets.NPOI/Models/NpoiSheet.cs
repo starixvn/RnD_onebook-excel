@@ -36,11 +36,21 @@
             return new NpoiCell(Sheet.GetRow(rowIndex).GetCell(colIndex));
         }
 
-        public Row GetRow(int rownum)
+        public Row GetRow(int rowIndex)
         {
-            return Sheet.GetRow(rownum) == null
-                ? new NpoiRow(Sheet.CreateRow(rownum))
-                : new NpoiRow(Sheet.GetRow(rownum));
+            return Sheet.GetRow(rowIndex) == null
+                ? new NpoiRow(Sheet.CreateRow(rowIndex))
+                : new NpoiRow(Sheet.GetRow(rowIndex));
+        }
+
+        public void RemoveRow(Row row)
+        {
+            var npoiRow = row as NpoiRow;
+
+            if (npoiRow != null)
+            {
+                Sheet.RemoveRow(npoiRow.Row);
+            }
         }
 
         public void SetCellRangeValue(int firstRow, int firstCol, int lastRow, int lastCol, string value)

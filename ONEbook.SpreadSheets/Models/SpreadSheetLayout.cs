@@ -1,10 +1,12 @@
 ﻿namespace ONEbook.SpreadSheets.Models
 {
     using System;
+    using System.Collections.Generic;
 
     public class SpreadSheetLayout
     {
         public SpreadSheetLayout(
+            Workbook workbook,
             int titleIndex = 1,
             int headerStartIndex = 2,
             int bodyStartIndex = 4,
@@ -12,10 +14,10 @@
             string freezeColumnName = "",
             int columnStartIndex = 1,
             int resultSheetIndex = 1,
-            int templateSheetIndex = 2,
             int oddRowTemplateIndex = 4,
             int evenRowTemplateIndex = 5,
-            int totalRowTemplateIndex = 6,
+            int footerRowsTemplateStartIndex = 6,
+            int footerRowsTemplateEndIndex = 6,
             string noInfomationText = "No information available.")
         {
             FreezeRowIndex = freezeRowIndex - 1;
@@ -27,14 +29,19 @@
             ResultSheetIndex = resultSheetIndex - 1;
             OddRowTemplateIndex = oddRowTemplateIndex - 1;
             EvenRowTemplateIndex = evenRowTemplateIndex - 1;
-            TotalRowTemplateIndex = totalRowTemplateIndex - 1;
-            TemplateSheetIndex = templateSheetIndex - 1;
+            FooterRowsTemplateStartIndex = footerRowsTemplateStartIndex - 1;
+            FooterRowsTemplateEndIndex = footerRowsTemplateEndIndex - 1;
             NoInfomationText = noInfomationText;
+
+            if (workbook == null)
+            {
+                throw new ArgumentNullException(nameof(workbook), "Workbook cannot be null.");
+            }
+
+            Workbook = workbook;
         }
 
         public int ResultSheetIndex { get; protected set; }
-
-        public int TemplateSheetIndex { get; protected set; }
 
         public int TitleIndex { get; protected set; }
 
@@ -52,31 +59,37 @@
 
         public int EvenRowTemplateIndex { get; protected set; }
 
-        public int TotalRowTemplateIndex { get; protected set; }
+        public int FooterRowsTemplateStartIndex { get; protected set; }
+
+        public int FooterRowsTemplateEndIndex { get; protected set; }
 
         public Row EvenRowTemplate { get; protected set; }
 
         public Row OddRowTemplate { get; protected set; }
 
-        public Row TotalRowTemplate { get; protected set; }
+        public IEnumerable<Row> TotalRowsTemplate { get; protected set; }
 
-        public Sheet TemplateSheet { get; protected set; }
+        public Sheet ResultSheet { get; protected set; }
 
         public string NoInfomationText { get; protected set; }
 
-        public Sheet LoadTemplateSheet(Workbook workbook)
+        public Workbook Workbook { get; protected set; }
+
+        public Sheet Load()
         {
-            if (workbook == null)
+            ResultSheet = Workbook.GetSheetAt(ResultSheetIndex);
+            OddRowTemplate = ResultSheet.GetRow(OddRowTemplateIndex);
+            EvenRowTemplate = ResultSheet.GetRow(EvenRowTemplateIndex);
+
+            var totalRowsTemplate = new List<Row>();
+            for (int rowIndex = FooterRowsTemplateStartIndex; rowIndex <= FooterRowsTemplateEndIndex; rowIndex++)
             {
-                throw new ArgumentNullException(nameof(workbook), "Workbook cannot be null");
+                totalRowsTemplate.Add(ResultSheet.GetRow(rowIndex));
             }
 
-            TemplateSheet = workbook.GetSheetAt(TemplateSheetIndex);
-            OddRowTemplate = TemplateSheet.GetRow(OddRowTemplateIndex);
-            EvenRowTemplate = TemplateSheet.GetRow(EvenRowTemplateIndex);
-            TotalRowTemplate = TemplateSheet.GetRow(TotalRowTemplateIndex);
+            TotalRowsTemplate = totalRowsTemplate;
 
-            return TemplateSheet;
+            return ResultSheet;
         }
 
         public SpreadSheetLayout SetTitleIndex(int titleIndex)
@@ -86,18 +99,15 @@
             return this;
         }
 
-        public SpreadSheetLayout SetSheetIndex(
-            int resultSheetIndex, 
-            int templateSheetIndex)
+        public SpreadSheetLayout SetSheetIndex(int resultSheetIndex)
         {
             ResultSheetIndex = resultSheetIndex - 1;
-            TemplateSheetIndex = templateSheetIndex - 1;
 
             return this;
         }
 
         public SpreadSheetLayout SetFreezePanel(
-            int freezeRowIndex, 
+            int freezeRowIndex,
             string freezeColumnName)
         {
             FreezeColumnName = freezeColumnName;
@@ -107,7 +117,7 @@
         }
 
         public SpreadSheetLayout SetRowsIndex(
-            int headerStartIndex = 2, 
+            int headerStartIndex = 2,
             int bodyStartIndex = 4)
         {
             HeaderStartIndex = headerStartIndex - 1;
@@ -117,13 +127,15 @@
         }
 
         public SpreadSheetLayout SetTemplateRowsIndex(
-            int oddRowTemplateIndex = 4, 
-            int evenRowTemplateIndex = 5, 
-            int totalRowTemplateIndex = 6)
+            int oddRowTemplateIndex = 4,
+            int evenRowTemplateIndex = 5,
+            int footerRowsTemplateStartIndex = 6,
+            int footerRowsTemplateEndIndex = 6)
         {
             OddRowTemplateIndex = oddRowTemplateIndex - 1;
             EvenRowTemplateIndex = evenRowTemplateIndex - 1;
-            TotalRowTemplateIndex = totalRowTemplateIndex - 1;
+            FooterRowsTemplateStartIndex = footerRowsTemplateStartIndex - 1;
+            FooterRowsTemplateEndIndex = footerRowsTemplateEndIndex - 1;
 
             return this;
         }
