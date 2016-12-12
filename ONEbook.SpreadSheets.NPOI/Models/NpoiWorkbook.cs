@@ -6,15 +6,6 @@
 
     public class NpoiWorkbook : Workbook
     {
-        public NpoiWorkbook(HSSFWorkbook workbook)
-        {
-            Workbook = workbook;
-        }
-
-        public NpoiWorkbook()
-        {
-        }
-
         public HSSFWorkbook Workbook { get; private set; }
 
         public Sheet GetSheetAt(int sheetIndex)

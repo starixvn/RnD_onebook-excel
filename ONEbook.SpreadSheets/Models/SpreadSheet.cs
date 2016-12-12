@@ -67,6 +67,14 @@
             return this;
         }
 
+        public SpreadSheet<T> AddFooter(T row, Func<T, int, IDictionary<string, object>> rowMapping)
+        {
+            FooterRows = new List<T> { row };
+            FooterRowMapping = rowMapping;
+
+            return this;
+        }
+
         public SpreadSheet<T> SetLayout(SpreadSheetLayout layout)
         {
             Layout = layout;

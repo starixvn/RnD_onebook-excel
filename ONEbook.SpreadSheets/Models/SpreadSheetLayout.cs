@@ -7,6 +7,7 @@
     {
         public SpreadSheetLayout(
             Workbook workbook,
+            string noInfomationText = "No information available.",
             int titleIndex = 1,
             int headerStartIndex = 2,
             int bodyStartIndex = 4,
@@ -17,8 +18,7 @@
             int oddRowTemplateIndex = 4,
             int evenRowTemplateIndex = 5,
             int footerRowsTemplateStartIndex = 6,
-            int footerRowsTemplateEndIndex = 6,
-            string noInfomationText = "No information available.")
+            int footerRowsTemplateEndIndex = 6)
         {
             FreezeRowIndex = freezeRowIndex - 1;
             FreezeColumnName = freezeColumnName;

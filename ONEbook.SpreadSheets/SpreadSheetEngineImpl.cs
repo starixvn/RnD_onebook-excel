@@ -95,14 +95,14 @@
 
             if (spreadSheet.Any())
             {
-                sheet = RenderBodyRows(sheet, layout, spreadSheet.BodyRows, rowIndex, spreadSheet.RowMapping);
-
                 sheet = RenderTotalRows(
                        sheet,
                        spreadSheet.FooterRows,
                        layout.TotalRowsTemplate,
                        spreadSheet.BodyRows.Count() + rowIndex,
                        spreadSheet.FooterRowMapping);
+
+                sheet = RenderBodyRows(sheet, layout, spreadSheet.BodyRows, rowIndex, spreadSheet.RowMapping);
             }
             else
             {
