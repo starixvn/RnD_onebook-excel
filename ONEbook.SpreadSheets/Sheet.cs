@@ -1,5 +1,7 @@
-﻿namespace ONEbook.SpreadSheets.Models
+﻿namespace ONEbook.SpreadSheets
 {
+    using System.Collections.Generic;
+
     public interface Sheet
     {
         Row GetRow(int rowIndex);
@@ -15,5 +17,11 @@
         void CreateFreezePane(int colIndex, int rowIndex);
 
         void RemoveRow(Row row);
+
+        Row EvenRowTemplate { get; set; }
+
+        Row OddRowTemplate { get; set; }
+
+        IEnumerable<Row> TotalRowsTemplate { get; set; }
     }
 }

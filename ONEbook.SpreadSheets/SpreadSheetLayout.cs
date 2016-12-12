@@ -1,12 +1,8 @@
-﻿namespace ONEbook.SpreadSheets.Models
+﻿namespace ONEbook.SpreadSheets
 {
-    using System;
-    using System.Collections.Generic;
-
     public class SpreadSheetLayout
     {
         public SpreadSheetLayout(
-            Workbook workbook,
             string noInfomationText = "No information available.",
             int titleIndex = 1,
             int headerStartIndex = 2,
@@ -32,13 +28,6 @@
             FooterRowsTemplateStartIndex = footerRowsTemplateStartIndex - 1;
             FooterRowsTemplateEndIndex = footerRowsTemplateEndIndex - 1;
             NoInfomationText = noInfomationText;
-
-            if (workbook == null)
-            {
-                throw new ArgumentNullException(nameof(workbook), "Workbook cannot be null.");
-            }
-
-            Workbook = workbook;
         }
 
         public int ResultSheetIndex { get; protected set; }
@@ -48,6 +37,8 @@
         public int ColumnStartIndex { get; protected set; }
 
         public int HeaderStartIndex { get; protected set; }
+
+        public int HeaderEndIndex => BodyStartIndex - 1;
 
         public int BodyStartIndex { get; protected set; }
 
@@ -63,34 +54,7 @@
 
         public int FooterRowsTemplateEndIndex { get; protected set; }
 
-        public Row EvenRowTemplate { get; protected set; }
-
-        public Row OddRowTemplate { get; protected set; }
-
-        public IEnumerable<Row> TotalRowsTemplate { get; protected set; }
-
-        public Sheet ResultSheet { get; protected set; }
-
         public string NoInfomationText { get; protected set; }
-
-        public Workbook Workbook { get; protected set; }
-
-        public Sheet Load()
-        {
-            ResultSheet = Workbook.GetSheetAt(ResultSheetIndex);
-            OddRowTemplate = ResultSheet.GetRow(OddRowTemplateIndex);
-            EvenRowTemplate = ResultSheet.GetRow(EvenRowTemplateIndex);
-
-            var totalRowsTemplate = new List<Row>();
-            for (int rowIndex = FooterRowsTemplateStartIndex; rowIndex <= FooterRowsTemplateEndIndex; rowIndex++)
-            {
-                totalRowsTemplate.Add(ResultSheet.GetRow(rowIndex));
-            }
-
-            TotalRowsTemplate = totalRowsTemplate;
-
-            return ResultSheet;
-        }
 
         public SpreadSheetLayout SetTitleIndex(int titleIndex)
         {

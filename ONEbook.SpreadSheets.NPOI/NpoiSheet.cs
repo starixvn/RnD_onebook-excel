@@ -1,8 +1,8 @@
-﻿namespace ONEbook.SpreadSheets.NPOI.Models
+﻿namespace ONEbook.SpreadSheets.NPOI
 {
+    using System.Collections.Generic;
     using global::NPOI.SS.UserModel;
     using global::NPOI.SS.Util;
-    using SpreadSheets.Models;
 
     public class NpoiSheet : Sheet
     {
@@ -11,7 +11,13 @@
             Sheet = sheet;
         }
 
+        public Row EvenRowTemplate { get; set; }
+
+        public Row OddRowTemplate { get; set; }
+
         public ISheet Sheet { get; }
+
+        public IEnumerable<Row> TotalRowsTemplate { get; set; }
 
         public void AppendRows(int destinateRowIndex)
         {

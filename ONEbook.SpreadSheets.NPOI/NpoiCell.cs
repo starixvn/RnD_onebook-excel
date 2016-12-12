@@ -1,10 +1,9 @@
-﻿namespace ONEbook.SpreadSheets.NPOI.Models
+﻿namespace ONEbook.SpreadSheets.NPOI
 {
     using System;
     using Fanex.Common;
     using global::NPOI.SS.UserModel;
     using global::NPOI.SS.Util;
-    using ONEbook.SpreadSheets.Models;
 
     public class NpoiCell : Cell
     {

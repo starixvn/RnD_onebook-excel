@@ -6,8 +6,7 @@ namespace ONEbook.SpreadSheets.Demo
     using System.IO;
     using System.Linq;
     using Models;
-    using ONEbook.SpreadSheets.Models;
-    using ONEbook.SpreadSheets.NPOI.Models;
+    using NPOI;
 
     internal class Program
     {
@@ -26,46 +25,45 @@ namespace ONEbook.SpreadSheets.Demo
 
         private static void ExportWinLossDetail(SpreadSheetEngineImpl spreadSheetEngine)
         {
+            var workbook = new NpoiWorkbook().Load(@"ExcelTemplates\WinLossDetail.xls");
             var spreadSheet = (new SpreadSheet<WinLossDetail>())
                                 .AddTitle("Demo Title")
                                 .AddHeaderTexts(GenerateDummyHeaderTexts())
                                 .AddBody(GenerateDummyBodyRows(), BodyRowMapping)
                                 .AddFooter(GenerateOneDummyRow(), FooterRowMapping)
                                 .AddSheetName("Demo SheetName")
-                                .SetLayout(
-                                        (new SpreadSheetLayout(
-                                            new NpoiWorkbook()
-                                            .Load(@"ExcelTemplates\WinLossDetail.xls")))
-                                        .SetFreezePanel(4, "B"));
+                                .SetLayout(new SpreadSheetLayout());
 
-            var exportStream = spreadSheetEngine.Export(spreadSheet);
+            var exportStream = spreadSheetEngine.Export(spreadSheet, workbook);
 
             SaveFile(exportStream, "WinLossDetail.xls");
         }
 
         private static void ExportWinLossDetailNoData(SpreadSheetEngineImpl spreadSheetEngine)
         {
+            var workbook = new NpoiWorkbook().Load(@"ExcelTemplates\WinLossDetail.xls");
             var spreadSheet = (new SpreadSheet<WinLossDetail>())
                                 .AddTitle("Demo title Demo titleDemo titleDemo titleDemo titleDemo titleDemo titleDemo title")
                                 .AddHeaderTexts(GenerateDummyHeaderTexts())
                                 .AddBody(Enumerable.Empty<WinLossDetail>(), BodyRowMapping)
                                 .AddSheetName("Demo SheetName")
-                                .SetLayout(new SpreadSheetLayout(new NpoiWorkbook().Load(@"ExcelTemplates\WinLossDetail.xls")));
+                                .SetLayout(new SpreadSheetLayout());
 
-            var exportStream = spreadSheetEngine.Export(spreadSheet);
+            var exportStream = spreadSheetEngine.Export(spreadSheet, workbook);
 
             SaveFile(exportStream, "WinLossDetail-NoData.xls");
         }
 
         private static void ExportWithMergeCells(SpreadSheetEngineImpl spreadSheetEngine)
         {
+            var workbook = new NpoiWorkbook().Load(@"ExcelTemplates\MergeBodyCells.xls");
             var spreadSheet = (new SpreadSheet<WinLossDetail>())
                                 .AddTitle("Demo Title")
                                 .AddHeaderTexts(GenerateDummyHeaderTexts())
                                 .AddBody(GenerateDummyBodyRows(), BodyRowMapping)
                                 .AddFooter(GenerateDummyFooterData(), FooterRowMapping)
                                 .AddSheetName("Demo SheetName")
-                                .SetLayout((new SpreadSheetLayout(new NpoiWorkbook().Load(@"ExcelTemplates\MergeBodyCells.xls")))
+                                .SetLayout((new SpreadSheetLayout())
                                     .SetTemplateRowsIndex(
                                         oddRowTemplateIndex: 4,
                                         evenRowTemplateIndex: 5,
@@ -73,13 +71,14 @@ namespace ONEbook.SpreadSheets.Demo
                                         footerRowsTemplateEndIndex: 8)
                                     .SetFreezePanel(4, "B"));
 
-            var exportStream = spreadSheetEngine.Export(spreadSheet);
+            var exportStream = spreadSheetEngine.Export(spreadSheet, workbook);
 
             SaveFile(exportStream, "MergeBodyCells.xls");
         }
 
         private static void ExportWithMultipleFooterRows(SpreadSheetEngineImpl spreadSheetEngine)
         {
+            var workbook = new NpoiWorkbook().Load(@"ExcelTemplates\MultipleTotalRows.xls");
             var spreadSheet = (new SpreadSheet<WinLossDetail>())
                                 .AddTitle("Demo Title")
                                 .AddHeaderTexts(GenerateDummyHeaderTexts())
@@ -87,7 +86,7 @@ namespace ONEbook.SpreadSheets.Demo
                                 .AddFooter(GenerateDummyFooterData(), FooterRowMapping)
                                 .AddSheetName("Demo SheetName")
                                 .SetLayout(
-                                    (new SpreadSheetLayout(new NpoiWorkbook().Load(@"ExcelTemplates\MultipleTotalRows.xls")))
+                                    (new SpreadSheetLayout())
                                     .SetTemplateRowsIndex(
                                         oddRowTemplateIndex: 4,
                                         evenRowTemplateIndex: 5,
@@ -95,21 +94,22 @@ namespace ONEbook.SpreadSheets.Demo
                                         footerRowsTemplateEndIndex: 8)
                                     .SetFreezePanel(4, "B"));
 
-            var exportStream = spreadSheetEngine.Export(spreadSheet);
+            var exportStream = spreadSheetEngine.Export(spreadSheet, workbook);
 
             SaveFile(exportStream, "MultipleTotalRows.xls");
         }
 
         private static void ExportWithNoTotalRow(SpreadSheetEngineImpl spreadSheetEngine)
         {
+            var workbook = new NpoiWorkbook().Load(@"ExcelTemplates\NoTotalRow.xls");
             var spreadSheet = (new SpreadSheet<WinLossDetail>())
                                 .AddTitle("Demo Title")
                                 .AddHeaderTexts(GenerateDummyHeaderTexts())
                                 .AddBody(GenerateOneDummyRow(), BodyRowMapping)
                                 .AddSheetName("Demo SheetName")
-                                .SetLayout((new SpreadSheetLayout(new NpoiWorkbook().Load(@"ExcelTemplates\NoTotalRow.xls"))).SetFreezePanel(4, "B"));
+                                .SetLayout((new SpreadSheetLayout()).SetFreezePanel(4, "B"));
 
-            var exportStream = spreadSheetEngine.Export(spreadSheet);
+            var exportStream = spreadSheetEngine.Export(spreadSheet, workbook);
 
             SaveFile(exportStream, "NoTotalRow.xls");
         }

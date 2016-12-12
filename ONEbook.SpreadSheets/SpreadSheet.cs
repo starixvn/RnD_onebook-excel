@@ -1,4 +1,4 @@
-﻿namespace ONEbook.SpreadSheets.Models
+﻿namespace ONEbook.SpreadSheets
 {
     using System;
     using System.Collections.Generic;

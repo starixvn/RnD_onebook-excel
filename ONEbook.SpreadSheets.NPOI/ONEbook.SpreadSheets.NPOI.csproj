@@ -66,10 +66,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="GlobalSuppressions.cs" />
-    <Compile Include="Models\NpoiCell.cs" />
-    <Compile Include="Models\NpoiRow.cs" />
-    <Compile Include="Models\NpoiSheet.cs" />
-    <Compile Include="Models\NpoiWorkbook.cs" />
+    <Compile Include="NpoiCell.cs" />
+    <Compile Include="NpoiRow.cs" />
+    <Compile Include="NpoiSheet.cs" />
+    <Compile Include="NpoiWorkbook.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

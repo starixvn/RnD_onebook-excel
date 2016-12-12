@@ -1,8 +1,7 @@
-﻿namespace ONEbook.SpreadSheets.NPOI.Models
+﻿namespace ONEbook.SpreadSheets.NPOI
 {
     using System.IO;
     using global::NPOI.HSSF.UserModel;
-    using SpreadSheets.Models;
 
     public class NpoiWorkbook : Workbook
     {

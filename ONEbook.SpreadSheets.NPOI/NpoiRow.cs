@@ -1,9 +1,8 @@
-﻿namespace ONEbook.SpreadSheets.NPOI.Models
+﻿namespace ONEbook.SpreadSheets.NPOI
 {
     using System;
     using System.Collections.Generic;
     using global::NPOI.SS.UserModel;
-    using SpreadSheets.Models;
 
     public class NpoiRow : Row
     {

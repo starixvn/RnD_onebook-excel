@@ -4,13 +4,12 @@
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Linq;
-    using Models;
 
     public class SpreadSheetEngineImpl : SpreadSheetEngine
     {
         private static readonly ConcurrentDictionary<string, int> ColumnNameToIndexMapping = new ConcurrentDictionary<string, int>();
 
-        public virtual byte[] Export<T>(SpreadSheet<T> spreadSheet) where T : class
+        public virtual byte[] Export<T>(SpreadSheet<T> spreadSheet, Workbook workbook) where T : class
         {
             if (spreadSheet == null)
             {
@@ -18,27 +17,44 @@
             }
 
             var layout = spreadSheet.Layout;
-            var resultSheet = layout.Load();
+            var sheet = LoadRowTemplates(layout, workbook);
 
-            layout.Workbook.SetSheetName(layout.ResultSheetIndex, spreadSheet.SheetName);
+            workbook.SetSheetName(layout.ResultSheetIndex, spreadSheet.SheetName);
 
-            resultSheet = RenderTitle(
-                resultSheet,
+            sheet = RenderTitle(
+                sheet,
                 layout.ColumnStartIndex,
                 layout.TitleIndex,
                 spreadSheet.Title);
 
-            resultSheet = RenderHeader(
-                resultSheet,
+            sheet = RenderHeader(
+                sheet,
                 spreadSheet.Layout.HeaderStartIndex,
-                spreadSheet.Layout.BodyStartIndex - 1,
+                spreadSheet.Layout.HeaderEndIndex,
                 spreadSheet.HeaderTexts);
 
-            resultSheet = RenderBody(resultSheet, spreadSheet);
+            sheet = RenderBody(sheet, spreadSheet);
 
-            resultSheet = RenderFreePanel(resultSheet, layout.FreezeRowIndex, layout.FreezeColumnName);
+            sheet = RenderFreezePanels(sheet, layout.FreezeRowIndex, layout.FreezeColumnName);
 
-            return layout.Workbook.ToBytes();
+            return workbook.ToBytes();
+        }
+
+        protected virtual Sheet LoadRowTemplates(SpreadSheetLayout layout, Workbook workbook)
+        {
+            var resultSheet = workbook.GetSheetAt(layout.ResultSheetIndex);
+            resultSheet.OddRowTemplate = resultSheet.GetRow(layout.OddRowTemplateIndex);
+            resultSheet.EvenRowTemplate = resultSheet.GetRow(layout.EvenRowTemplateIndex);
+
+            var totalRowsTemplate = new List<Row>();
+            for (int rowIndex = layout.FooterRowsTemplateStartIndex; rowIndex <= layout.FooterRowsTemplateEndIndex; rowIndex++)
+            {
+                totalRowsTemplate.Add(resultSheet.GetRow(rowIndex));
+            }
+
+            resultSheet.TotalRowsTemplate = totalRowsTemplate;
+
+            return resultSheet;
         }
 
         protected virtual Sheet RenderHeader(
@@ -91,18 +107,17 @@
             var rowIndex = layout.BodyStartIndex;
             var columnStartIndex = layout.ColumnStartIndex;
 
-            sheet = RemoveUnusedTemplateRows(sheet, layout);
+            sheet = RemoveTemplateRows(sheet);
 
             if (spreadSheet.Any())
             {
                 sheet = RenderTotalRows(
                        sheet,
                        spreadSheet.FooterRows,
-                       layout.TotalRowsTemplate,
                        spreadSheet.BodyRows.Count() + rowIndex,
                        spreadSheet.FooterRowMapping);
 
-                sheet = RenderBodyRows(sheet, layout, spreadSheet.BodyRows, rowIndex, spreadSheet.RowMapping);
+                sheet = RenderBodyRows(sheet, spreadSheet.BodyRows, rowIndex, spreadSheet.RowMapping);
             }
             else
             {
@@ -114,7 +129,6 @@
 
         protected virtual Sheet RenderBodyRows<T>(
             Sheet sheet,
-            SpreadSheetLayout layout,
             IEnumerable<T> bodyRows,
             int rowIndex,
             Func<T, int, IDictionary<string, object>> rowMapping) where T : class
@@ -124,18 +138,13 @@
                 throw new ArgumentNullException(nameof(sheet), "Sheet cannot be null");
             }
 
-            if (layout == null)
-            {
-                throw new ArgumentNullException(nameof(layout), "Layout cannot be null");
-            }
-
             var isEven = false;
             var dataLength = bodyRows.Count();
 
             for (var dataIndex = 0; dataIndex < dataLength; dataIndex++, rowIndex++)
             {
                 var row = sheet.GetRow(rowIndex);
-                var templateRow = isEven ? layout.EvenRowTemplate : layout.OddRowTemplate;
+                var templateRow = isEven ? sheet.EvenRowTemplate : sheet.OddRowTemplate;
                 var cellValuesWithColumnName = rowMapping(bodyRows.ElementAt(dataIndex), rowIndex);
 
                 row.CopyCellsFrom(templateRow);
@@ -166,7 +175,7 @@
                     rowIndex,
                     colIndex,
                     rowIndex,
-                    layout.OddRowTemplate.LastCellIndex - 1,
+                    sheet.OddRowTemplate.LastCellIndex - 1,
                     layout.NoInfomationText);
 
             sheet.GetCell(rowIndex, colIndex).SetCenterHorizontalAlignment();
@@ -174,14 +183,12 @@
             return sheet;
         }
 
-        protected virtual Sheet RemoveUnusedTemplateRows(
-            Sheet sheet,
-            SpreadSheetLayout layout)
+        protected virtual Sheet RemoveTemplateRows(Sheet sheet)
         {
-            sheet.RemoveRow(layout.EvenRowTemplate);
-            sheet.RemoveRow(layout.OddRowTemplate);
+            sheet.RemoveRow(sheet.EvenRowTemplate);
+            sheet.RemoveRow(sheet.OddRowTemplate);
 
-            foreach (var template in layout.TotalRowsTemplate)
+            foreach (var template in sheet.TotalRowsTemplate)
             {
                 sheet.RemoveRow(template);
             }
@@ -207,7 +214,7 @@
             return sheet;
         }
 
-        protected virtual Sheet RenderFreePanel(Sheet sheet, int freezeRowIndex, string freeColumnName)
+        protected virtual Sheet RenderFreezePanels(Sheet sheet, int freezeRowIndex, string freeColumnName)
         {
             var freeColumnIndex = string.IsNullOrWhiteSpace(freeColumnName) ? 0 : GetColIndex(freeColumnName);
             if (freeColumnIndex > 0 || freezeRowIndex > 0)
@@ -221,7 +228,6 @@
         protected virtual Sheet RenderTotalRows<T>(
             Sheet sheet,
             IEnumerable<T> totalData,
-            IEnumerable<Row> totalRowsTemplate,
             int rowIndex,
             Func<T, int, IDictionary<string, object>> rowMapping) where T : class
         {
@@ -240,7 +246,7 @@
             for (var dataIndex = 0; dataIndex < dataLength; dataIndex++, rowIndex++)
             {
                 var row = sheet.GetRow(rowIndex);
-                var templateRow = totalRowsTemplate.ElementAt(dataIndex);
+                var templateRow = sheet.TotalRowsTemplate.ElementAt(dataIndex);
                 var cellValuesWithColumnName = rowMapping(totalData.ElementAt(dataIndex), rowIndex);
 
                 row.CopyCellsFrom(templateRow);
