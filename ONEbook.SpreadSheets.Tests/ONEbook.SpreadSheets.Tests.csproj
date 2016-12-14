@@ -49,7 +49,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Serivces\SpreadSheetServiceImplTests.cs" />
+    <Compile Include="SpreadSheetServiceImplTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ONEbook.SpreadSheets\ONEbook.SpreadSheets.csproj">

@@ -21,7 +21,7 @@
         {
             if (row == null)
             {
-                throw new ArgumentNullException("targetRow");
+                throw new ArgumentNullException(nameof(row));
             }
 
             for (var i = row.FirstCellIndex; i < row.LastCellIndex; i++)

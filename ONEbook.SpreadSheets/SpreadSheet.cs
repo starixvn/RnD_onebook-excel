@@ -12,9 +12,9 @@
             FooterRows = Enumerable.Empty<T>();
         }
 
-        public string Title { get; protected set; }
+        public string TitleText { get; protected set; }
 
-        public IDictionary<string, string> HeaderTexts { get; protected set; }
+        public Func<string, string> HeaderMapping { get; protected set; }
 
         public string SheetName { get; protected set; }
 
@@ -22,62 +22,53 @@
 
         public IEnumerable<T> FooterRows { get; protected set; }
 
-        public SpreadSheetLayout Layout { get; protected set; }
+        public Mapper<T> RowMapper { get; protected set; }
 
-        public Func<T, int, IDictionary<string, object>> RowMapping { get; protected set; }
-
-        public Func<T, int, IDictionary<string, object>> FooterRowMapping { get; protected set; }
+        public Mapper<T> FooterRowMapper { get; protected set; }
 
         public bool Any() => BodyRows.Any();
 
-        public SpreadSheet<T> AddBody(IEnumerable<T> rows, Func<T, int, IDictionary<string, object>> rowMapping)
+        public SpreadSheet<T> Body(IEnumerable<T> rows, Mapper<T> rowMapping)
         {
             BodyRows = rows;
-            RowMapping = rowMapping;
+            RowMapper = rowMapping;
 
             return this;
         }
 
-        public SpreadSheet<T> AddTitle(string title)
+        public SpreadSheet<T> Title(string title)
         {
-            Title = title;
+            TitleText = title;
 
             return this;
         }
 
-        public SpreadSheet<T> AddSheetName(string sheetName)
+        public SpreadSheet<T> Sheet(string sheetName)
         {
             SheetName = sheetName;
 
             return this;
         }
 
-        public SpreadSheet<T> AddHeaderTexts(IDictionary<string, string> headerTexts)
+        public SpreadSheet<T> Header(Func<string, string> headerMapping)
         {
-            HeaderTexts = headerTexts;
+            HeaderMapping = headerMapping;
 
             return this;
         }
 
-        public SpreadSheet<T> AddFooter(IEnumerable<T> rows, Func<T, int, IDictionary<string, object>> rowMapping)
+        public SpreadSheet<T> Footer(IEnumerable<T> rows, Mapper<T> rowMapping)
         {
             FooterRows = rows;
-            FooterRowMapping = rowMapping;
+            FooterRowMapper = rowMapping;
 
             return this;
         }
 
-        public SpreadSheet<T> AddFooter(T row, Func<T, int, IDictionary<string, object>> rowMapping)
+        public SpreadSheet<T> Footer(T row, Mapper<T> rowMapping)
         {
             FooterRows = new List<T> { row };
-            FooterRowMapping = rowMapping;
-
-            return this;
-        }
-
-        public SpreadSheet<T> SetLayout(SpreadSheetLayout layout)
-        {
-            Layout = layout;
+            FooterRowMapper = rowMapping;
 
             return this;
         }

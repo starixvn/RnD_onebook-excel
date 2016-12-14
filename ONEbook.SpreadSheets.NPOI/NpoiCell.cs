@@ -34,7 +34,7 @@
         {
             if (cell == null)
             {
-                throw new ArgumentNullException("targetCell");
+                throw new ArgumentNullException(nameof(cell));
             }
 
             CopyMergeInfoFrom(cell);

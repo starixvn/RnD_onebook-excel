@@ -1,4 +1,4 @@
-﻿namespace ONEbook.SpreadSheets.Tests.Serivces
+﻿namespace ONEbook.SpreadSheets.Tests
 {
     public class SpreadSheetServiceImplTests
     {

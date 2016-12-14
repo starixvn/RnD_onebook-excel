@@ -4,6 +4,12 @@
 
     public interface Sheet
     {
+        Row EvenRowTemplate { get; set; }
+
+        Row OddRowTemplate { get; set; }
+
+        IEnumerable<Row> TotalRowsTemplate { get; set; }
+
         Row GetRow(int rowIndex);
 
         void AppendRows(int destinateRowIndex);
@@ -17,11 +23,5 @@
         void CreateFreezePane(int colIndex, int rowIndex);
 
         void RemoveRow(Row row);
-
-        Row EvenRowTemplate { get; set; }
-
-        Row OddRowTemplate { get; set; }
-
-        IEnumerable<Row> TotalRowsTemplate { get; set; }
     }
 }

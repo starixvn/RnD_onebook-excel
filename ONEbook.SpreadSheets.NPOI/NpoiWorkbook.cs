@@ -3,16 +3,16 @@
     using System.IO;
     using global::NPOI.HSSF.UserModel;
 
-    public class NpoiWorkbook : Workbook
+    public class NpoiWorkbook<T> : Workbook<T> where T : class
     {
         public HSSFWorkbook Workbook { get; private set; }
 
-        public Sheet GetSheetAt(int sheetIndex)
+        protected override Sheet GetSheetAt(int sheetIndex)
         {
             return new NpoiSheet(Workbook.GetSheetAt(sheetIndex));
         }
 
-        public Workbook Load(string templatePath)
+        protected override Workbook<T> Load(string templatePath)
         {
             using (FileStream file = new FileStream(templatePath, FileMode.Open, FileAccess.Read))
             {
@@ -22,12 +22,12 @@
             return this;
         }
 
-        public void SetSheetName(int index, string name)
+        protected override void SetSheetName(int index, string name)
         {
             Workbook.SetSheetName(index, name);
         }
 
-        public byte[] ToBytes()
+        protected override byte[] ToBytes()
         {
             using (var memoryStream = new MemoryStream())
             {
@@ -37,7 +37,7 @@
             }
         }
 
-        public void RemoveSheetAt(int sheetIndex)
+        protected override void RemoveSheetAt(int sheetIndex)
         {
             Workbook.RemoveSheetAt(sheetIndex);
         }

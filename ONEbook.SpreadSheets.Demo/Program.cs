@@ -12,161 +12,125 @@ namespace ONEbook.SpreadSheets.Demo
     {
         private static void Main()
         {
-            var spreadSheetEngine = new SpreadSheetEngineImpl();
-
-            ExportWinLossDetail(spreadSheetEngine);
-            ExportWinLossDetailNoData(spreadSheetEngine);
-            ExportWithMultipleFooterRows(spreadSheetEngine);
-            ExportWithMergeCells(spreadSheetEngine);
-            ExportWithNoTotalRow(spreadSheetEngine);
+            ExportWinLossDetail();
+            ExportWinLossDetailNoData();
+            ExportWithMultipleFooterRows();
+            ExportWithMergeCells();
+            ExportWithNoTotalRow();
 
             Console.WriteLine("Export Done!");
         }
 
-        private static void ExportWinLossDetail(SpreadSheetEngineImpl spreadSheetEngine)
+        private static void ExportWinLossDetail()
         {
-            var workbook = new NpoiWorkbook().Load(@"ExcelTemplates\WinLossDetail.xls");
-            var spreadSheet = (new SpreadSheet<WinLossDetail>())
-                                .AddTitle("Demo Title")
-                                .AddHeaderTexts(GenerateDummyHeaderTexts())
-                                .AddBody(GenerateDummyBodyRows(), BodyRowMapping)
-                                .AddFooter(GenerateOneDummyRow(), FooterRowMapping)
-                                .AddSheetName("Demo SheetName")
-                                .SetLayout(new SpreadSheetLayout());
-
-            var exportStream = spreadSheetEngine.Export(spreadSheet, workbook);
+            var exportStream = new NpoiWorkbook<WinLossDetail>()
+                                    .UseTemplate(new TemplateInfo(@"ExcelTemplates\WinLossDetail.xls"))
+                                    .Title("Demo Title")
+                                    .Header(HeaderMapping)
+                                    .Body(GenerateDummyBodyRows(), bodyRowMapper)
+                                    .Footer(GenerateOneDummyRow(), bodyRowMapper)
+                                    .Sheet("Demo SheetName")
+                                    .ExportToBytes();
 
             SaveFile(exportStream, "WinLossDetail.xls");
         }
 
-        private static void ExportWinLossDetailNoData(SpreadSheetEngineImpl spreadSheetEngine)
+        private static void ExportWinLossDetailNoData()
         {
-            var workbook = new NpoiWorkbook().Load(@"ExcelTemplates\WinLossDetail.xls");
-            var spreadSheet = (new SpreadSheet<WinLossDetail>())
-                                .AddTitle("Demo title Demo titleDemo titleDemo titleDemo titleDemo titleDemo titleDemo title")
-                                .AddHeaderTexts(GenerateDummyHeaderTexts())
-                                .AddBody(Enumerable.Empty<WinLossDetail>(), BodyRowMapping)
-                                .AddSheetName("Demo SheetName")
-                                .SetLayout(new SpreadSheetLayout());
-
-            var exportStream = spreadSheetEngine.Export(spreadSheet, workbook);
-
-            SaveFile(exportStream, "WinLossDetail-NoData.xls");
+            new NpoiWorkbook<WinLossDetail>()
+                .UseTemplate(new TemplateInfo(@"ExcelTemplates\WinLossDetail.xls"))
+                .Title("Demo title Demo titleDemo titleDemo titleDemo titleDemo titleDemo titleDemo title")
+                .Header(HeaderMapping)
+                .Body(Enumerable.Empty<WinLossDetail>(), bodyRowMapper)
+                .Sheet("Demo SheetName")
+                .ExportToFile("WinLossDetail-NoData.xls");
         }
 
-        private static void ExportWithMergeCells(SpreadSheetEngineImpl spreadSheetEngine)
+        private static void ExportWithMergeCells()
         {
-            var workbook = new NpoiWorkbook().Load(@"ExcelTemplates\MergeBodyCells.xls");
-            var spreadSheet = (new SpreadSheet<WinLossDetail>())
-                                .AddTitle("Demo Title")
-                                .AddHeaderTexts(GenerateDummyHeaderTexts())
-                                .AddBody(GenerateDummyBodyRows(), BodyRowMapping)
-                                .AddFooter(GenerateDummyFooterData(), FooterRowMapping)
-                                .AddSheetName("Demo SheetName")
-                                .SetLayout((new SpreadSheetLayout())
-                                    .SetTemplateRowsIndex(
-                                        oddRowTemplateIndex: 4,
-                                        evenRowTemplateIndex: 5,
-                                        footerRowsTemplateStartIndex: 6,
-                                        footerRowsTemplateEndIndex: 8)
-                                    .SetFreezePanel(4, "B"));
-
-            var exportStream = spreadSheetEngine.Export(spreadSheet, workbook);
-
-            SaveFile(exportStream, "MergeBodyCells.xls");
+            new NpoiWorkbook<WinLossDetail>()
+                .UseTemplate(new TemplateInfo(@"ExcelTemplates\MergeBodyCells.xls")
+                                .Footer(footerEndIndex: 8)
+                                .FreezePanel(4, Column.B))
+                .Title("Demo Title")
+                .Header(HeaderMapping)
+                .Body(GenerateDummyBodyRows(), bodyRowMapper)
+                .Footer(GenerateDummyFooterData(), bodyRowMapper)
+                .Sheet("Demo SheetName")
+                .ExportToFile("MergeBodyCells.xls");
         }
 
-        private static void ExportWithMultipleFooterRows(SpreadSheetEngineImpl spreadSheetEngine)
+        private static void ExportWithMultipleFooterRows()
         {
-            var workbook = new NpoiWorkbook().Load(@"ExcelTemplates\MultipleTotalRows.xls");
-            var spreadSheet = (new SpreadSheet<WinLossDetail>())
-                                .AddTitle("Demo Title")
-                                .AddHeaderTexts(GenerateDummyHeaderTexts())
-                                .AddBody(GenerateDummyBodyRows(), BodyRowMapping)
-                                .AddFooter(GenerateDummyFooterData(), FooterRowMapping)
-                                .AddSheetName("Demo SheetName")
-                                .SetLayout(
-                                    (new SpreadSheetLayout())
-                                    .SetTemplateRowsIndex(
-                                        oddRowTemplateIndex: 4,
-                                        evenRowTemplateIndex: 5,
-                                        footerRowsTemplateStartIndex: 6,
-                                        footerRowsTemplateEndIndex: 8)
-                                    .SetFreezePanel(4, "B"));
-
-            var exportStream = spreadSheetEngine.Export(spreadSheet, workbook);
+            var exportStream = new NpoiWorkbook<WinLossDetail>()
+                                .UseTemplate(new TemplateInfo(@"ExcelTemplates\MultipleTotalRows.xls")
+                                                .Footer(footerEndIndex: 8)
+                                                .FreezePanel(4, Column.B))
+                                .Title("Demo Title")
+                                .Header(HeaderMapping)
+                                .Body(GenerateDummyBodyRows(), bodyRowMapper)
+                                .Footer(GenerateDummyFooterData(), bodyRowMapper)
+                                .Sheet("Demo SheetName")
+                                .ExportToBytes();
 
             SaveFile(exportStream, "MultipleTotalRows.xls");
         }
 
-        private static void ExportWithNoTotalRow(SpreadSheetEngineImpl spreadSheetEngine)
+        private static void ExportWithNoTotalRow()
         {
-            var workbook = new NpoiWorkbook().Load(@"ExcelTemplates\NoTotalRow.xls");
-            var spreadSheet = (new SpreadSheet<WinLossDetail>())
-                                .AddTitle("Demo Title")
-                                .AddHeaderTexts(GenerateDummyHeaderTexts())
-                                .AddBody(GenerateOneDummyRow(), BodyRowMapping)
-                                .AddSheetName("Demo SheetName")
-                                .SetLayout((new SpreadSheetLayout()).SetFreezePanel(4, "B"));
-
-            var exportStream = spreadSheetEngine.Export(spreadSheet, workbook);
-
-            SaveFile(exportStream, "NoTotalRow.xls");
+            new NpoiWorkbook<WinLossDetail>()
+                .UseTemplate(new TemplateInfo(@"ExcelTemplates\NoTotalRow.xls").FreezePanel(4, Column.B))
+                .Title("Demo Title")
+                .Header(HeaderMapping)
+                .Body(GenerateOneDummyRow(), bodyRowMapper)
+                .Sheet("Demo SheetName")
+                .ExportToFile("NoTotalRow.xls");
         }
 
-        private static IDictionary<string, object> BodyRowMapping(WinLossDetail data, int rowIndex)
-        {
-            return new Dictionary<string, object>
-                    {
-                        { "J", data.AgentNetWinLoss.Comm },
-                        { "K", data.AgentNetWinLoss.Total },
-                        { "L", data.MasterNetWinLoss.WinLoss },
-                        { "M", data.MasterNetWinLoss.Comm },
-                        { "N", data.MasterNetWinLoss.Total },
-                        { "O", data.SuperNetWinLoss.WinLoss },
-                        { "P", data.SuperNetWinLoss.Comm },
-                        { "Q", data.SuperNetWinLoss.Total },
-                        { "R", data.Company },
-                        { "A", data.CustName },
-                        { "B", data.NumberOfTickets },
-                        { "C", data.Turnover },
-                        { "D", data.NetTurnover },
-                        { "E", data.GrossComm },
-                        { "F", data.MemberNetWinLoss.WinLoss },
-                        { "G", data.MemberNetWinLoss.Comm },
-                        { "H", data.MemberNetWinLoss.Total },
-                        { "I", data.AgentNetWinLoss.WinLoss },
-                    };
-        }
+        private static Mapper<WinLossDetail> bodyRowMapper = new Mapper<WinLossDetail>()
+                .Map(Column.J, winLossDetail => winLossDetail.AgentNetWinLoss.Comm)
+                .Map(Column.K, winLossDetail => winLossDetail.AgentNetWinLoss.Total)
+                .Map(Column.L, winLossDetail => winLossDetail.MasterNetWinLoss.WinLoss)
+                .Map(Column.M, winLossDetail => winLossDetail.MasterNetWinLoss.Comm)
+                .Map(Column.N, winLossDetail => winLossDetail.MasterNetWinLoss.Total)
+                .Map(Column.O, winLossDetail => winLossDetail.SuperNetWinLoss.WinLoss)
+                .Map(Column.P, winLossDetail => winLossDetail.SuperNetWinLoss.Comm)
+                .Map(Column.Q, winLossDetail => winLossDetail.SuperNetWinLoss.Total)
+                .Map(Column.R, winLossDetail => winLossDetail.Company)
+                .Map(Column.A, winLossDetail => winLossDetail.CustName)
+                .Map(Column.B, winLossDetail => winLossDetail.NumberOfTickets)
+                .Map(Column.C, winLossDetail => winLossDetail.Turnover)
+                .Map(Column.D, winLossDetail => winLossDetail.NetTurnover)
+                .Map(Column.E, winLossDetail => winLossDetail.GrossComm)
+                .Map(Column.F, winLossDetail => winLossDetail.MemberNetWinLoss.WinLoss)
+                .Map(Column.G, winLossDetail => winLossDetail.MemberNetWinLoss.Comm)
+                .Map(Column.H, winLossDetail => winLossDetail.MemberNetWinLoss.Total)
+                .Map(Column.I, winLossDetail => winLossDetail.AgentNetWinLoss.WinLoss);
 
-        private static IDictionary<string, object> FooterRowMapping(WinLossDetail data, int rowIndex)
-        {
-            return new Dictionary<string, object>
-                    {
-                        { "A", "Total" },
-                        { "J", data.AgentNetWinLoss.Comm },
-                        { "K", data.AgentNetWinLoss.Total },
-                        { "L", data.MasterNetWinLoss.WinLoss },
-                        { "M", data.MasterNetWinLoss.Comm },
-                        { "N", data.MasterNetWinLoss.Total },
-                        { "O", data.SuperNetWinLoss.WinLoss },
-                        { "P", data.SuperNetWinLoss.Comm },
-                        { "Q", data.SuperNetWinLoss.Total },
-                        { "R", data.Company },
-                        { "B", data.NumberOfTickets },
-                        { "C", data.Turnover },
-                        { "D", data.NetTurnover },
-                        { "E", data.GrossComm },
-                        { "F", data.MemberNetWinLoss.WinLoss },
-                        { "G", data.MemberNetWinLoss.Comm },
-                        { "H", data.MemberNetWinLoss.Total },
-                        { "I", data.AgentNetWinLoss.WinLoss },
-                    };
-        }
+        //private static Mapper<WinLossDetail> footerRowMapper = new Mapper<WinLossDetail>()
+        //        .Map(Column.J, winLossDetail => winLossDetail.AgentNetWinLoss.Comm)
+        //        .Map(Column.K, winLossDetail => winLossDetail.AgentNetWinLoss.Total)
+        //        .Map(Column.L, winLossDetail => winLossDetail.MasterNetWinLoss.WinLoss)
+        //        .Map(Column.M, winLossDetail => winLossDetail.MasterNetWinLoss.Comm)
+        //        .Map(Column.N, winLossDetail => winLossDetail.MasterNetWinLoss.Total)
+        //        .Map(Column.O, winLossDetail => winLossDetail.SuperNetWinLoss.WinLoss)
+        //        .Map(Column.P, winLossDetail => winLossDetail.SuperNetWinLoss.Comm)
+        //        .Map(Column.Q, winLossDetail => winLossDetail.SuperNetWinLoss.Total)
+        //        .Map(Column.R, winLossDetail => winLossDetail.Company)
+        //        .Map(Column.A, winLossDetail => winLossDetail.Cust)
+        //        .Map(Column.B, winLossDetail => winLossDetail.NumberOfTickets)
+        //        .Map(Column.C, winLossDetail => winLossDetail.Turnover)
+        //        .Map(Column.D, winLossDetail => winLossDetail.NetTurnover)
+        //        .Map(Column.E, winLossDetail => winLossDetail.GrossComm)
+        //        .Map(Column.F, winLossDetail => winLossDetail.MemberNetWinLoss.WinLoss)
+        //        .Map(Column.G, winLossDetail => winLossDetail.MemberNetWinLoss.Comm)
+        //        .Map(Column.H, winLossDetail => winLossDetail.MemberNetWinLoss.Total)
+        //        .Map(Column.I, winLossDetail => winLossDetail.AgentNetWinLoss.WinLoss);
 
-        private static Dictionary<string, string> GenerateDummyHeaderTexts()
+        private static string HeaderMapping(string resourceKey)
         {
-            return new Dictionary<string, string>
+
+            var resourceManager = new Dictionary<string, string>
                 {
                     { "Username", "Username" },
                     { "NumberOfTickets", "Number Of Tickets" },
@@ -190,6 +154,8 @@ namespace ONEbook.SpreadSheets.Demo
                     { "Master", "Master" },
                     { "Super", "Super" }
                 };
+
+            return resourceManager.ContainsKey(resourceKey) ? resourceManager[resourceKey] : resourceKey;
         }
 
         private static IEnumerable<WinLossDetail> GenerateDummyBodyRows()
