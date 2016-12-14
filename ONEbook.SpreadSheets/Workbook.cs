@@ -76,13 +76,13 @@
 
             SetSheetName(TemplateInfo.SheetIndex, SpreadSheet.SheetName);
 
-            sheet = RenderTitle(sheet);
+            FillTitle(sheet);
 
-            sheet = RenderHeader(sheet);
+            FillHeader(sheet);
 
-            sheet = RenderBody(sheet);
+            FillBody(sheet);
 
-            sheet = RenderFreezePanels(sheet);
+            FillFreezePanels(sheet);
 
             return ToBytes();
         }
@@ -120,7 +120,7 @@
             return sheet;
         }
 
-        protected internal virtual Sheet RenderHeader(Sheet sheet)
+        protected internal virtual void FillHeader(Sheet sheet)
         {
             if (sheet == null)
             {
@@ -144,34 +144,29 @@
                     }
                 }
             }
-
-            return sheet;
         }
 
-        protected internal virtual Sheet RenderBody(Sheet sheet)
+        protected internal virtual void FillBody(Sheet sheet)
         {
             if (sheet == null)
             {
                 throw new ArgumentNullException(nameof(sheet), "Sheet cannot be null");
             }
 
-            sheet = RemoveTemplateRows(sheet);
+            RemoveTemplateRows(sheet);
 
             if (SpreadSheet.Any())
             {
-                sheet = RenderTotalRows(sheet);
-
-                sheet = RenderBodyRows(sheet);
+                FillTotalRows(sheet);
+                FillBodyRows(sheet);
             }
             else
             {
-                sheet = RenderNoInfoRow(sheet);
+                FillNoInfoRow(sheet);
             }
-
-            return sheet;
         }
 
-        protected internal virtual Sheet RenderBodyRows(Sheet sheet)
+        protected internal virtual void FillBodyRows(Sheet sheet)
         {
             if (sheet == null)
             {
@@ -186,34 +181,15 @@
             {
                 var row = sheet.GetRow(rowIndex);
                 var templateRow = isEven ? sheet.EvenRowTemplate : sheet.OddRowTemplate;
-                var cellValuesWithColumnName = Map(SpreadSheet.RowMapper, SpreadSheet.BodyRows.ElementAt(dataIndex));
+                var cellValuesWithColumnName = SpreadSheet.RowMapper.GetResults(SpreadSheet.BodyRows.ElementAt(dataIndex));
 
                 row.CopyCellsFrom(templateRow);
                 row.SetCellValues(ConvertColumnNameToIndex(cellValuesWithColumnName));
                 isEven = !isEven;
             }
-
-            return sheet;
         }
 
-        protected internal virtual IDictionary<string, object> Map(Mapper<T> mapper, T data)
-        {
-            if (mapper == null)
-            {
-                throw new ArgumentNullException(nameof(mapper), "Mapper cannot be null");
-            }
-
-            var resultObjects = new Dictionary<string, object>();
-
-            foreach (var mapping in mapper.Mappings)
-            {
-                resultObjects.Add(mapping.Key, mapping.Value(data));
-            }
-
-            return resultObjects;
-        }
-
-        protected internal virtual Sheet RenderNoInfoRow(Sheet sheet)
+        protected internal virtual void FillNoInfoRow(Sheet sheet)
         {
             if (sheet == null)
             {
@@ -231,11 +207,9 @@
                     TemplateInfo.NoInfomationText);
 
             sheet.GetCell(rowIndex, colIndex).SetCenterHorizontalAlignment();
-
-            return sheet;
         }
 
-        protected internal virtual Sheet RemoveTemplateRows(Sheet sheet)
+        protected internal virtual void RemoveTemplateRows(Sheet sheet)
         {
             if (sheet == null)
             {
@@ -249,11 +223,9 @@
             {
                 sheet.RemoveRow(template);
             }
-
-            return sheet;
         }
 
-        protected internal virtual Sheet RenderTitle(Sheet sheet)
+        protected internal virtual void FillTitle(Sheet sheet)
         {
             if (sheet == null)
             {
@@ -262,15 +234,13 @@
 
             if (TemplateInfo.TitleStartIndex < 0)
             {
-                return sheet;
+                return;
             }
 
             sheet.SetCellValue(TemplateInfo.TitleStartIndex, Column.GetColIndex(TemplateInfo.ColumnStartName), SpreadSheet.TitleText);
-
-            return sheet;
         }
 
-        protected internal virtual Sheet RenderFreezePanels(Sheet sheet)
+        protected internal virtual void FillFreezePanels(Sheet sheet)
         {
             if (sheet == null)
             {
@@ -282,11 +252,9 @@
             {
                 sheet.CreateFreezePane(freeColumnIndex, TemplateInfo.FreezeRowIndex);
             }
-
-            return sheet;
         }
 
-        protected internal virtual Sheet RenderTotalRows(Sheet sheet)
+        protected internal virtual void FillTotalRows(Sheet sheet)
         {
             if (sheet == null)
             {
@@ -295,7 +263,7 @@
 
             if (!SpreadSheet.FooterRows.Any())
             {
-                return sheet;
+                return;
             }
 
             var dataLength = SpreadSheet.FooterRows.Count();
@@ -305,13 +273,11 @@
             {
                 var row = sheet.GetRow(rowIndex);
                 var templateRow = sheet.TotalRowsTemplate.ElementAt(dataIndex);
-                var cellValuesWithColumnName = Map(SpreadSheet.FooterRowMapper, SpreadSheet.FooterRows.ElementAt(dataIndex));
+                var cellValuesWithColumnName = SpreadSheet.RowMapper.GetResults(SpreadSheet.FooterRows.ElementAt(dataIndex));
 
                 row.CopyCellsFrom(templateRow);
                 row.SetCellValues(ConvertColumnNameToIndex(cellValuesWithColumnName));
             }
-
-            return sheet;
         }
 
         internal IDictionary<int, object> ConvertColumnNameToIndex(IDictionary<string, object> cellValuesWithColumnName)
