@@ -3,6 +3,7 @@ namespace ONEbook.SpreadSheets.Demo
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.IO;
     using System.Linq;
     using Models;
@@ -12,7 +13,14 @@ namespace ONEbook.SpreadSheets.Demo
     {
         private static void Main()
         {
+            Stopwatch stopwatch = new Stopwatch();
+
+            stopwatch.Start();
             ExportWinLossDetail();
+            stopwatch.Stop();
+
+            Console.WriteLine("WinLossDetail.xls 66530 rows : {0}", stopwatch.Elapsed);
+
             ExportWinLossDetailNoData();
             ExportWithMultipleFooterRows();
             ExportWithMergeCells();
@@ -27,7 +35,7 @@ namespace ONEbook.SpreadSheets.Demo
                                     .UseTemplate(new TemplateInfo(@"ExcelTemplates\WinLossDetail.xls"))
                                     .Title("Demo Title")
                                     .Header(HeaderMapping)
-                                    .Body(GenerateDummyBodyRows(), bodyRowMapper)
+                                    .Body(GenerateDummyBodyRows(65530), bodyRowMapper)
                                     .Footer(GenerateOneDummyRow(), bodyRowMapper)
                                     .Sheet("Demo SheetName")
                                     .ExportToBytes();
@@ -54,7 +62,7 @@ namespace ONEbook.SpreadSheets.Demo
                                 .FreezePanel(4, Column.B))
                 .Title("Demo Title")
                 .Header(HeaderMapping)
-                .Body(GenerateDummyBodyRows(), bodyRowMapper)
+                .Body(GenerateDummyBodyRows(100), bodyRowMapper)
                 .Footer(GenerateDummyFooterData(), bodyRowMapper)
                 .Sheet("Demo SheetName")
                 .ExportToFile("MergeBodyCells.xls");
@@ -68,7 +76,7 @@ namespace ONEbook.SpreadSheets.Demo
                                                 .FreezePanel(4, Column.B))
                                 .Title("Demo Title")
                                 .Header(HeaderMapping)
-                                .Body(GenerateDummyBodyRows(), bodyRowMapper)
+                                .Body(GenerateDummyBodyRows(200), bodyRowMapper)
                                 .Footer(GenerateDummyFooterData(), bodyRowMapper)
                                 .Sheet("Demo SheetName")
                                 .ExportToBytes();
@@ -158,17 +166,26 @@ namespace ONEbook.SpreadSheets.Demo
             return resourceManager.ContainsKey(resourceKey) ? resourceManager[resourceKey] : resourceKey;
         }
 
-        private static IEnumerable<WinLossDetail> GenerateDummyBodyRows()
+        private static IEnumerable<WinLossDetail> GenerateDummyBodyRows(int length)
         {
-            return new List<WinLossDetail>
+            var dummyData = new List<WinLossDetail>();
+
+            for (int i = 0; i < length; i++)
             {
-                new WinLossDetail(10, "name 1", 1000, 30000, 20000, 40, new NetWinLoss(200.23m, 4), new NetWinLoss(5, 6),new NetWinLoss(7, 8),new NetWinLoss(80.23m, 9)),
-                new WinLossDetail(10, "name 2", 10001, 30000, 20000, 40000, new NetWinLoss(2, 40.23m), new NetWinLoss(5, 6),new NetWinLoss(7, 80.23m),new NetWinLoss(80.23m, 9)),
-                new WinLossDetail(10, "name 3", 10002, 30000, 20000, 40000, new NetWinLoss(2, 4), new NetWinLoss(5, 6),new NetWinLoss(70.23m, 8),new NetWinLoss(8, 9)),
-                new WinLossDetail(10, "name 4", 13000, 30000, 20000, 40000, new NetWinLoss(20.23m, 4), new NetWinLoss(50.23m, 6),new NetWinLoss(7, 8),new NetWinLoss(8, 9)),
-                new WinLossDetail(10, "name 5", 10005, 30000, 20, 40, new NetWinLoss(2, 40.23m), new NetWinLoss(5, 60.23m),new NetWinLoss(70.23m, 8),new NetWinLoss(8, 9)),
-                new WinLossDetail(10, "name 6", 10006, 30000, 20000, 40, new NetWinLoss(20.23m, 4), new NetWinLoss(5, 6),new NetWinLoss(70.23m, 8),new NetWinLoss(80.23m, 9))
-            };
+                dummyData.Add(new WinLossDetail(
+                    10 + i, 
+                    "name " + i, 
+                    1000 + i, 
+                    30000 + i, 
+                    20000 + i, 
+                    40 + i, 
+                    new NetWinLoss(200.23m + i, 4 + i), 
+                    new NetWinLoss(5 + i, 6 + i), 
+                    new NetWinLoss(7 + i, 8 + i), 
+                    new NetWinLoss(80.23m + i, 9 + i)));
+            }
+
+            return dummyData;
         }
 
         private static IEnumerable<WinLossDetail> GenerateDummyFooterData()

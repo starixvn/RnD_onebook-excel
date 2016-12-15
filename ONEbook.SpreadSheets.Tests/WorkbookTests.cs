@@ -11,7 +11,7 @@
     [TestFixture]
     public class WorkbookTests
     {
-        Workbook<object> workBook;
+        private Workbook<object> workBook;
 
         [SetUp]
         public void SetUp()

@@ -181,10 +181,11 @@
             {
                 var row = sheet.GetRow(rowIndex);
                 var templateRow = isEven ? sheet.EvenRowTemplate : sheet.OddRowTemplate;
-                var cellValuesWithColumnName = SpreadSheet.RowMapper.GetResults(SpreadSheet.BodyRows.ElementAt(dataIndex));
 
                 row.CopyCellsFrom(templateRow);
-                row.SetCellValues(ConvertColumnNameToIndex(cellValuesWithColumnName));
+
+                FillCells(row, SpreadSheet.BodyRows.ElementAt(dataIndex), SpreadSheet.RowMapper.Mappings);
+
                 isEven = !isEven;
             }
         }
@@ -273,22 +274,24 @@
             {
                 var row = sheet.GetRow(rowIndex);
                 var templateRow = sheet.TotalRowsTemplate.ElementAt(dataIndex);
-                var cellValuesWithColumnName = SpreadSheet.RowMapper.GetResults(SpreadSheet.FooterRows.ElementAt(dataIndex));
 
                 row.CopyCellsFrom(templateRow);
-                row.SetCellValues(ConvertColumnNameToIndex(cellValuesWithColumnName));
+
+                FillCells(row, SpreadSheet.FooterRows.ElementAt(dataIndex), SpreadSheet.FooterRowMapper.Mappings);
             }
         }
 
-        internal IDictionary<int, object> ConvertColumnNameToIndex(IDictionary<string, object> cellValuesWithColumnName)
+        protected internal virtual void FillCells(Row row, T data, IDictionary<string, Func<T, object>> mappings)
         {
-            var columnValuesWithIndex = new Dictionary<int, object>();
-            foreach (var cellValue in cellValuesWithColumnName)
+            if (!mappings.Keys.Any())
             {
-                columnValuesWithIndex.Add(Column.GetColIndex(cellValue.Key), cellValue.Value);
+                return;
             }
 
-            return columnValuesWithIndex;
+            foreach (var mapping in mappings)
+            {
+                row.SetCellValue(Column.GetColIndex(mapping.Key), mapping.Value(data));
+            }
         }
     }
 }
