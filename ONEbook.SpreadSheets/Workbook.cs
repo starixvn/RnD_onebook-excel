@@ -11,15 +11,15 @@
 
         protected internal virtual TemplateInfo TemplateInfo { get; set; }
 
-        protected abstract Workbook<T> Load(string templatePath);
+        protected internal abstract Workbook<T> Load(string templatePath);
 
-        protected abstract void SetSheetName(int index, string name);
+        protected internal abstract void FillSheetName(int index, string name);
 
-        protected abstract byte[] ToBytes();
+        protected internal abstract byte[] ToBytes();
 
-        protected abstract Sheet GetSheetAt(int sheetIndex);
+        protected internal abstract Sheet GetSheetAt(int sheetIndex);
 
-        protected abstract void RemoveSheetAt(int sheetIndex);
+        protected internal abstract void RemoveSheetAt(int sheetIndex);
 
         public virtual Workbook<T> UseTemplate(TemplateInfo templateInfo)
         {
@@ -67,14 +67,15 @@
         public virtual Workbook<T> Footer(T row, Mapper<T> rowMapper)
         {
             SpreadSheet.Footer(row, rowMapper);
+
             return this;
         }
 
         public virtual byte[] ExportToBytes()
         {
-            var sheet = LoadRowTemplates();
+            var sheet = LoadTemplateSheet();
 
-            SetSheetName(TemplateInfo.SheetIndex, SpreadSheet.SheetName);
+            FillSheetName(TemplateInfo.SheetIndex, SpreadSheet.SheetName);
 
             FillTitle(sheet);
 
@@ -102,20 +103,20 @@
             }
         }
 
-        protected internal virtual Sheet LoadRowTemplates()
+        protected internal virtual Sheet LoadTemplateSheet()
         {
             var sheet = GetSheetAt(TemplateInfo.SheetIndex);
 
             sheet.OddRowTemplate = sheet.GetRow(TemplateInfo.OddRowTemplateIndex);
             sheet.EvenRowTemplate = sheet.GetRow(TemplateInfo.EvenRowTemplateIndex);
 
-            var totalRowsTemplate = new List<Row>();
+            var footerRowsTemplate = new List<Row>();
             for (int rowIndex = TemplateInfo.FooterStartIndex; rowIndex <= TemplateInfo.FooterEndIndex; rowIndex++)
             {
-                totalRowsTemplate.Add(sheet.GetRow(rowIndex));
+                footerRowsTemplate.Add(sheet.GetRow(rowIndex));
             }
 
-            sheet.TotalRowsTemplate = totalRowsTemplate;
+            sheet.FooterRowsTemplate = footerRowsTemplate;
 
             return sheet;
         }
@@ -220,7 +221,7 @@
             sheet.RemoveRow(sheet.EvenRowTemplate);
             sheet.RemoveRow(sheet.OddRowTemplate);
 
-            foreach (var template in sheet.TotalRowsTemplate)
+            foreach (var template in sheet.FooterRowsTemplate)
             {
                 sheet.RemoveRow(template);
             }
@@ -251,7 +252,7 @@
             var freeColumnIndex = string.IsNullOrWhiteSpace(TemplateInfo.FreezeColumnName) ? 0 : Column.GetColIndex(TemplateInfo.FreezeColumnName);
             if (freeColumnIndex > 0 || TemplateInfo.FreezeRowIndex > 0)
             {
-                sheet.CreateFreezePane(freeColumnIndex, TemplateInfo.FreezeRowIndex);
+                sheet.CreateFreezePanel(freeColumnIndex, TemplateInfo.FreezeRowIndex);
             }
         }
 
@@ -273,7 +274,7 @@
             for (var dataIndex = 0; dataIndex < dataLength; dataIndex++, rowIndex++)
             {
                 var row = sheet.GetRow(rowIndex);
-                var templateRow = sheet.TotalRowsTemplate.ElementAt(dataIndex);
+                var templateRow = sheet.FooterRowsTemplate.ElementAt(dataIndex);
 
                 row.CopyCellsFrom(templateRow);
 

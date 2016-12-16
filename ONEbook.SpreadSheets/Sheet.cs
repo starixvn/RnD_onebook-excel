@@ -8,7 +8,7 @@
 
         Row OddRowTemplate { get; set; }
 
-        IEnumerable<Row> TotalRowsTemplate { get; set; }
+        IEnumerable<Row> FooterRowsTemplate { get; set; }
 
         Row GetRow(int rowIndex);
 
@@ -20,7 +20,7 @@
 
         Cell GetCell(int rowIndex, int colIndex);
 
-        void CreateFreezePane(int colIndex, int rowIndex);
+        void CreateFreezePanel(int colIndex, int rowIndex);
 
         void RemoveRow(Row row);
     }

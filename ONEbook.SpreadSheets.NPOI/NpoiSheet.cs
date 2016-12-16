@@ -17,7 +17,7 @@
 
         public ISheet Sheet { get; }
 
-        public IEnumerable<Row> TotalRowsTemplate { get; set; }
+        public IEnumerable<Row> FooterRowsTemplate { get; set; }
 
         public void AppendRows(int destinateRowIndex)
         {
@@ -32,7 +32,7 @@
             }
         }
 
-        public void CreateFreezePane(int colIndex, int rowIndex)
+        public void CreateFreezePanel(int colIndex, int rowIndex)
         {
             Sheet.CreateFreezePane(colIndex, rowIndex);
         }

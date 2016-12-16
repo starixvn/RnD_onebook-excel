@@ -22,7 +22,7 @@
             return this;
         }
 
-        protected override void SetSheetName(int index, string name)
+        protected override void FillSheetName(int index, string name)
         {
             Workbook.SetSheetName(index, name);
         }
