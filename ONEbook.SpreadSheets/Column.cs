@@ -37,6 +37,26 @@
         public const string AD = A + D;
         public const string AE = A + E;
         public const string AF = A + F;
+        public const string AG = A + G;
+        public const string AH = A + H;
+        public const string AI = A + I;
+        public const string AJ = A + J;
+        public const string AK = A + K;
+        public const string AL = A + L;
+        public const string AM = A + M;
+        public const string AN = A + N;
+        public const string AO = A + O;
+        public const string AP = A + P;
+        public const string AQ = A + Q;
+        public const string AR = A + R;
+        public const string AS = A + S;
+        public const string AT = A + T;
+        public const string AU = A + U;
+        public const string AV = A + V;
+        public const string AW = A + W;
+        public const string AX = A + X;
+        public const string AY = A + Y;
+        public const string AZ = A + Z;
 
         private static readonly ConcurrentDictionary<string, int> ColumnNameToIndexMapping = new ConcurrentDictionary<string, int>();
 

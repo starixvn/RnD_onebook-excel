@@ -30,7 +30,7 @@
             }
         }
 
-        public void CopyFrom(Cell cell)
+        public virtual void CopyFrom(Cell cell)
         {
             if (cell == null)
             {
@@ -71,7 +71,7 @@
             }
         }
 
-        public void CopyMergeInfoFrom(Cell cell)
+        public virtual void CopyMergeInfoFrom(Cell cell)
         {
             var npoiCell = cell as NpoiCell;
 
@@ -111,7 +111,7 @@
             }
         }
 
-        public void SetCellValue(object value)
+        public virtual void SetCellValue(object value)
         {
             if (Cell == null)
             {

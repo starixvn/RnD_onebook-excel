@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using KellermanSoftware.CompareNetObjects;
     using NSubstitute;
     using NUnit.Framework;
 
@@ -15,6 +16,7 @@
         private Sheet sheet;
         private Row row;
         private Cell cell;
+        private CompareLogic compareLogic;
 
         [SetUp]
         public void SetUp()
@@ -25,6 +27,7 @@
             sheet = Substitute.For<Sheet>();
             row = Substitute.For<Row>();
             cell = Substitute.For<Cell>();
+            compareLogic = new CompareLogic();
 
             workbook.TemplateInfo.Returns(templateInfo);
             workbook.SpreadSheet.Returns(spreadSheet);
@@ -511,14 +514,14 @@
             row.ReceivedWithAnyArgs(2).SetCellValue(1, 2);
         }
 
-        #endregion
+        #endregion Fill Cells
 
         #region Export To Bytes
 
         [Test]
         public void ExportToBytes_Always_CallByOrder()
         {
-            // Acc 
+            // Acc
             workbook.ExportToBytes();
 
             // Assert
@@ -534,17 +537,121 @@
             });
         }
 
-        #endregion
+        #endregion Export To Bytes
 
         #region Assign data
 
         [Test]
         public void UseTemplate_Always_SetTemplateInfo()
         {
+            // Arrange
+            var workbookStub = Substitute.ForPartsOf<Workbook<object>>();
+            var templateInfoStub = new TemplateInfo("template-path");
 
+            // Act
+            workbookStub.UseTemplate(templateInfoStub);
+
+            // Assert
+            Assert.IsTrue(compareLogic.Compare(templateInfoStub, workbookStub.TemplateInfo).AreEqual);
         }
 
+        [Test]
+        public void UseTemplate_Always_ExecuteLoadTemplate()
+        {
+            // Act
+            workbook.UseTemplate(templateInfo);
 
-        #endregion
+            // Assert
+            workbook.Received().Load(templateInfo.TemplatePath);
+        }
+
+        [Test]
+        public void Body_Always_SetSpreadSheetBody()
+        {
+            // Arrange
+            var rowMapper = new Mapper<object>();
+            var bodyRows = new List<object> { new object() };
+            workbook.SpreadSheet.Returns(Substitute.For<SpreadSheet<object>>());
+
+            // Act
+            workbook.Body(bodyRows, rowMapper);
+
+            // Assert
+            workbook.SpreadSheet.Received().Body(bodyRows, rowMapper);
+        }
+
+        [Test]
+        public void Title_Always_SetSpreadSheetTitle()
+        {
+            // Arrange
+            var titleText = "titleText";
+            workbook.SpreadSheet.Returns(Substitute.For<SpreadSheet<object>>());
+
+            // Act
+            workbook.Title(titleText);
+
+            // Assert
+            workbook.SpreadSheet.Received().Title(titleText);
+        }
+
+        [Test]
+        public void Sheet_Always_SetSpreadSheetSheet()
+        {
+            // Arrange
+            var sheetName = "sheetName";
+            workbook.SpreadSheet.Returns(Substitute.For<SpreadSheet<object>>());
+
+            // Act
+            workbook.Sheet(sheetName);
+
+            // Assert
+            workbook.SpreadSheet.Received().Sheet(sheetName);
+        }
+
+        [Test]
+        public void Header_Always_SetSpreadSheetHeader()
+        {
+            // Arrange
+            Func<string, string> headerMapping = (a) => a.ToString();
+            workbook.SpreadSheet.Returns(Substitute.For<SpreadSheet<object>>());
+
+            // Act
+            workbook.Header(headerMapping);
+
+            // Assert
+            workbook.SpreadSheet.Received().Header(headerMapping);
+        }
+
+        [Test]
+        public void Footer_Always_SetSpreadSheetMultipleFooterRows()
+        {
+            // Arrange
+            var footerMapper = new Mapper<object>();
+            var footerRows = new List<object> { new object() };
+            workbook.SpreadSheet.Returns(Substitute.For<SpreadSheet<object>>());
+
+            // Act
+            workbook.Footer(footerRows, footerMapper);
+
+            // Assert
+            workbook.SpreadSheet.Received().Footer(footerRows, footerMapper);
+        }
+
+        [Test]
+        public void Footer_Always_SetSpreadSheetSingleFooterRow()
+        {
+            // Arrange
+            var footerMapper = new Mapper<object>();
+            var footerRow = new object();
+            workbook.SpreadSheet.Returns(Substitute.For<SpreadSheet<object>>());
+
+            // Act
+            workbook.Footer(footerRow, footerMapper);
+
+            // Assert
+            workbook.SpreadSheet.Received().Footer(footerRow, footerMapper);
+        }
+
+        #endregion Assign data
     }
 }
