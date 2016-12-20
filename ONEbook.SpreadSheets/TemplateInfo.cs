@@ -106,9 +106,9 @@
             return this;
         }
 
-        public TemplateInfo NoInformationText(string noInformationText)
+        public TemplateInfo NoInformationText(string noInfoText)
         {
-            NoInfomationText = noInformationText;
+            NoInfomationText = noInfoText;
 
             return this;
         }

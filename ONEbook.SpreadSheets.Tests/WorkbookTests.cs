@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.IO;
     using System.Linq;
     using KellermanSoftware.CompareNetObjects;
     using NSubstitute;
@@ -276,7 +277,7 @@
         }
 
         [Test]
-        public void FillBody_SpreadSheetHasNoData_ExecuteFillFillNoInfoRow()
+        public void FillBody_SpreadSheetHasNoData_ExecuteFillNoInfoRow()
         {
             // Arrange
             spreadSheet.Body(Enumerable.Empty<object>(), Substitute.For<Mapper<object>>());
@@ -485,6 +486,18 @@
         #region Fill Cells
 
         [Test]
+        public void FillCells_RowIsNull_ThrowArgumentNullException()
+        {
+            Assert.Throws<ArgumentNullException>(() => workbook.FillCells(null, null, new Dictionary<string, Func<object, object>>()));
+        }
+
+        [Test]
+        public void FillCells_MappingsIsNull_ThrowArgumentNullException()
+        {
+            Assert.Throws<ArgumentNullException>(() => workbook.FillCells(Substitute.For<Row>(), new object(), null));
+        }
+
+        [Test]
         public void FillCells_MappingsHasNoData_DontFillCellValue()
         {
             // Arrange
@@ -653,5 +666,30 @@
         }
 
         #endregion Assign data
+
+        #region ExportToFile
+
+        [TestCase("")]
+        [TestCase(" ")]
+        [TestCase(null)]
+        public void ExportToFile_FilePathIsNullOrWhiteSpace_ThrowArgumentOutOfRangeException(string filePath)
+        {
+            Assert.Throws<ArgumentOutOfRangeException>(() => workbook.ExportToFile(filePath));
+        }
+
+        [Test]
+        public void ExportToFile_GetExportedBytes_ExecuteWriteByteToFile()
+        {
+            // Arrange
+            var stream = Substitute.For<Stream>();
+
+            // Act
+            workbook.ExportToFile("asdad", stream);
+
+            // Assert
+            stream.ReceivedWithAnyArgs().Write(null, 0, 0);
+        }
+
+        #endregion
     }
 }

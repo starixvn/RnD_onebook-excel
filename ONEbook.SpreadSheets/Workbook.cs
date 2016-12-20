@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using System.IO;
     using System.Linq;
 
@@ -36,9 +37,9 @@
             return this;
         }
 
-        public virtual Workbook<T> Title(string title)
+        public virtual Workbook<T> Title(string titleText)
         {
-            SpreadSheet.Title(title);
+            SpreadSheet.Title(titleText);
 
             return this;
         }
@@ -88,7 +89,7 @@
             return ToBytes();
         }
 
-        public virtual void ExportToFile(string filePath)
+        public virtual void ExportToFile(string filePath, Stream stream = null)
         {
             if (string.IsNullOrWhiteSpace(filePath))
             {
@@ -97,7 +98,7 @@
 
             var bytes = ExportToBytes();
 
-            using (FileStream fileStream = File.Create(filePath, bytes.Length))
+            using (Stream fileStream = stream ?? File.Create(filePath, bytes.Length))
             {
                 fileStream.Write(bytes, 0, bytes.Length);
             }
@@ -282,8 +283,19 @@
             }
         }
 
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "Reviewed")]
         protected internal virtual void FillCells(Row row, T data, IDictionary<string, Func<T, object>> mappings)
         {
+            if (row == null)
+            {
+                throw new ArgumentNullException(nameof(row), "Row cannot be null");
+            }
+
+            if (mappings == null)
+            {
+                throw new ArgumentNullException(nameof(mappings), "Mappings cannot be null");
+            }
+
             if (!mappings.Keys.Any())
             {
                 return;

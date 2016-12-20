@@ -119,6 +119,7 @@
             }
 
             var isNumber = value is double
+                || value is float
                 || value is int
                 || value is long
                 || value is decimal;

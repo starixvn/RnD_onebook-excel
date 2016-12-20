@@ -36,9 +36,9 @@
             return this;
         }
 
-        public SpreadSheet<T> Title(string title)
+        public SpreadSheet<T> Title(string titleText)
         {
-            TitleText = title;
+            TitleText = titleText;
 
             return this;
         }

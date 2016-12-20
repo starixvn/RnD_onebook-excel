@@ -1,7 +1,6 @@
 ﻿namespace ONEbook.SpreadSheets.NPOI
 {
     using System;
-    using System.Collections.Generic;
     using global::NPOI.SS.UserModel;
 
     public class NpoiRow : Row
@@ -21,7 +20,7 @@
         {
             if (row == null)
             {
-                throw new ArgumentNullException(nameof(row));
+                throw new ArgumentNullException(nameof(row), "Row cannot be null");
             }
 
             for (var i = row.FirstCellIndex; i < row.LastCellIndex; i++)
@@ -48,7 +47,7 @@
             Row.Height = npoiRow.Row.Height;
         }
 
-        public Cell GetCell(int cellnum)
+        public virtual Cell GetCell(int cellnum)
         {
             return Row.GetCell(cellnum) == null
                 ? new NpoiCell(Row.CreateCell(cellnum))
@@ -59,19 +58,6 @@
         {
             var cell = GetCell(colIndex);
             cell.SetCellValue(value);
-        }
-
-        public void SetCellValues(IDictionary<int, object> values)
-        {
-            if (values == null)
-            {
-                throw new ArgumentNullException(nameof(values), "Cell Values cannot be null");
-            }
-
-            foreach (var value in values)
-            {
-                SetCellValue(value.Key, value.Value);
-            }
         }
     }
 }

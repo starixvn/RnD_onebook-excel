@@ -2,10 +2,11 @@
 {
     using System.IO;
     using global::NPOI.HSSF.UserModel;
+    using global::NPOI.SS.UserModel;
 
     public class NpoiWorkbook<T> : Workbook<T> where T : class
     {
-        public HSSFWorkbook Workbook { get; private set; }
+        public IWorkbook Workbook { get; internal set; }
 
         protected override Sheet GetSheetAt(int sheetIndex)
         {

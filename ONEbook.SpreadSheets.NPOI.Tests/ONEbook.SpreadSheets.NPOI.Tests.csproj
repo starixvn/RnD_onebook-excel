@@ -34,6 +34,10 @@
       <HintPath>..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="KellermanSoftware.Compare-NET-Objects, Version=3.6.0.0, Culture=neutral, PublicKeyToken=d970ace04cc85217, processorArchitecture=MSIL">
+      <HintPath>..\packages\CompareNETObjects.3.06.0.0\lib\net46\KellermanSoftware.Compare-NET-Objects.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="NPOI, Version=2.2.1.0, Culture=neutral, PublicKeyToken=0df73ec7942b34e1, processorArchitecture=MSIL">
       <HintPath>..\packages\NPOI.2.2.1\lib\net40\NPOI.dll</HintPath>
       <Private>True</Private>
@@ -69,9 +73,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="NpoiCellTests.cs" />
+    <Compile Include="NpoiRowTests.cs" />
+    <Compile Include="NpoiSheetTests.cs" />
+    <Compile Include="NpoiWorkbookTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="AppReadme\Compare-NET-Objects-Help.chm" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

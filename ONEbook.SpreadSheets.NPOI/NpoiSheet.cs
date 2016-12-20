@@ -19,7 +19,7 @@
 
         public IEnumerable<Row> FooterRowsTemplate { get; set; }
 
-        public void AppendRows(int destinateRowIndex)
+        public virtual void AppendRows(int destinateRowIndex)
         {
             if (destinateRowIndex <= Sheet.LastRowNum)
             {
@@ -68,7 +68,7 @@
             SetCellValue(firstRow, firstCol, value);
         }
 
-        public void SetCellValue(int rowIndex, int colIndex, object value)
+        public virtual void SetCellValue(int rowIndex, int colIndex, object value)
         {
             var row = GetRow(rowIndex);
             row.SetCellValue(colIndex, value);
