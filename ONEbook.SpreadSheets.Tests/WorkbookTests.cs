@@ -273,7 +273,7 @@
 
             // Assert
             workbook.Received().FillBodyRows(sheet);
-            workbook.Received().FillTotalRows(sheet);
+            workbook.Received().FillFooterRows(sheet);
         }
 
         [Test]
@@ -423,7 +423,7 @@
         [Test]
         public void FillTotalRows_SheetIsNull_ThrowArgumentNullException()
         {
-            Assert.Throws<ArgumentNullException>(() => workbook.FillTotalRows(null));
+            Assert.Throws<ArgumentNullException>(() => workbook.FillFooterRows(null));
         }
 
         [Test]
@@ -433,7 +433,7 @@
             sheet.GetCell(Arg.Any<int>(), Arg.Any<int>()).Returns(cell);
 
             // Act
-            workbook.FillTotalRows(sheet);
+            workbook.FillFooterRows(sheet);
 
             // Assert
             sheet.DidNotReceiveWithAnyArgs().GetRow(Arg.Any<int>());
@@ -453,7 +453,7 @@
             sheet.GetRow(Arg.Any<int>()).Returns(row);
 
             // Act
-            workbook.FillTotalRows(sheet);
+            workbook.FillFooterRows(sheet);
 
             // Assert
             row.Received().CopyCellsFrom(templateRow1);
@@ -475,7 +475,7 @@
             sheet.GetRow(Arg.Any<int>()).Returns(row);
 
             // Act
-            workbook.FillTotalRows(sheet);
+            workbook.FillFooterRows(sheet);
 
             // Assert
             workbook.ReceivedWithAnyArgs(2).FillCells(row, Arg.Any<object>(), rowMapper.Mappings);

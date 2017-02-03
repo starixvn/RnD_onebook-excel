@@ -159,7 +159,7 @@
 
             if (SpreadSheet.Any())
             {
-                FillTotalRows(sheet);
+                FillFooterRows(sheet);
                 FillBodyRows(sheet);
             }
             else
@@ -257,7 +257,7 @@
             }
         }
 
-        protected internal virtual void FillTotalRows(Sheet sheet)
+        protected internal virtual void FillFooterRows(Sheet sheet)
         {
             if (sheet == null)
             {
