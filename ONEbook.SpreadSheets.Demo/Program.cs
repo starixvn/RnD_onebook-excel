@@ -25,6 +25,7 @@ namespace ONEbook.SpreadSheets.Demo
             ExportWithMultipleFooterRows();
             ExportWithMergeCells();
             ExportWithNoTotalRow();
+            ExportWithMergedFooterRows();
 
             Console.WriteLine("Export Done!");
         }
@@ -62,7 +63,7 @@ namespace ONEbook.SpreadSheets.Demo
                                 .FreezePanel(4, Column.B))
                 .Title("Demo Title")
                 .Header(HeaderMapping)
-                .Body(GenerateDummyBodyRows(100), bodyRowMapper)
+                .Body(GenerateDummyBodyRows(1), bodyRowMapper)
                 .Footer(GenerateDummyFooterData(), bodyRowMapper)
                 .Sheet("Demo SheetName")
                 .ExportToFile("MergeBodyCells.xls");
@@ -93,6 +94,22 @@ namespace ONEbook.SpreadSheets.Demo
                 .Body(GenerateOneDummyRow(), bodyRowMapper)
                 .Sheet("Demo SheetName")
                 .ExportToFile("NoTotalRow.xls");
+        }
+
+        private static void ExportWithMergedFooterRows()
+        {
+            var exportStream = new NpoiWorkbook<WinLossDetail>()
+                                .UseTemplate(new TemplateInfo(@"ExcelTemplates\MergedTotalRows.xls")
+                                                .Footer(footerEndIndex: 8)
+                                                .FreezePanel(4, Column.B))
+                                .Title("Demo Title")
+                                .Header(HeaderMapping)
+                                .Body(GenerateDummyBodyRows(20), bodyRowMapper)
+                                .Footer(GenerateDummyFooterData(), bodyRowMapper)
+                                .Sheet("Demo SheetName")
+                                .ExportToBytes();
+
+            SaveFile(exportStream, "MergedTotalRows.xls");
         }
 
         private static Mapper<WinLossDetail> bodyRowMapper = new Mapper<WinLossDetail>()

@@ -1,5 +1,6 @@
 ﻿namespace ONEbook.SpreadSheets.NPOI.Tests
 {
+    using System.IO;
     using global::NPOI.SS.UserModel;
     using NSubstitute;
     using NUnit.Framework;
@@ -36,6 +37,41 @@
 
             // Assert
             workbook.Received().RemoveSheetAt(1);
+        }
+
+        [Test]
+        public void ToBytes_Always_ExecuteGetMemoryStream()
+        {
+            // Acc
+            npoiWorkbook.ToBytes();
+
+            // Assert
+            npoiWorkbook.Received().GetMemoryStream();
+        }
+
+        [Test]
+        public void ToBytes_Always_ReturnStreamBuffer()
+        {
+            // Arrange
+            var npoiWorkbookForTesting = new NpoiWorkbookForTesting();
+            npoiWorkbookForTesting.Workbook = workbook;
+
+            // Acc
+            var actualBuffer = npoiWorkbookForTesting.ToBytes();
+
+            // Assert
+            Assert.AreEqual(new byte[] { 1, 2 }, actualBuffer);
+        }
+    }
+
+    public class NpoiWorkbookForTesting : NpoiWorkbook<object>
+    {
+        internal override MemoryStream GetMemoryStream()
+        {
+            var expectedBuffer = new byte[] { 1, 2 };
+            var memoryStream = Substitute.ForPartsOf<MemoryStream>();
+            memoryStream.GetBuffer().Returns(expectedBuffer);
+            return memoryStream;
         }
     }
 }

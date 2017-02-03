@@ -15,12 +15,17 @@
 
         protected override Workbook<T> Load(string templatePath)
         {
-            using (FileStream file = new FileStream(templatePath, FileMode.Open, FileAccess.Read))
+            using (FileStream file = GetFileStream(templatePath))
             {
                 Workbook = new HSSFWorkbook(file);
             }
 
             return this;
+        }
+
+        internal virtual FileStream GetFileStream(string templatePath)
+        {
+            return new FileStream(templatePath, FileMode.Open, FileAccess.Read);
         }
 
         protected override void FillSheetName(int index, string name)
@@ -30,12 +35,17 @@
 
         protected override byte[] ToBytes()
         {
-            using (var memoryStream = new MemoryStream())
+            using (var memoryStream = GetMemoryStream())
             {
                 Workbook.Write(memoryStream);
 
                 return memoryStream.GetBuffer();
             }
+        }
+
+        internal virtual MemoryStream GetMemoryStream()
+        {
+            return new MemoryStream();
         }
 
         protected override void RemoveSheetAt(int sheetIndex)

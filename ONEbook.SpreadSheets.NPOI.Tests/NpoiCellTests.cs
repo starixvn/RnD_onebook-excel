@@ -308,7 +308,7 @@
         }
 
         [Test]
-        public void CopyMergeInfoFrom_SourceCellIsMergedCell_Return()
+        public void CopyMergeInfoFrom_SourceCellIsNotMergedCell_Return()
         {
             // Arrange
             sourceCell.IsMergedCell.Returns(false);
@@ -318,6 +318,42 @@
 
             // Assert
             npoiCell.Cell.Sheet.DidNotReceiveWithAnyArgs().GetMergedRegion(1);
+        }
+
+        [Test]
+        public void CopyMergeInfoFrom_SourceCellIsNotMergedCellAndTargetCellHasMerge_RemoveTargetCellMerging()
+        {
+            // Arrange
+            sourceCell.IsMergedCell.Returns(false);
+            npoiCell.Cell.IsMergedCell.Returns(true);
+
+            // Act
+            npoiCell.CopyMergeInfoFrom(sourceNpoiCell);
+
+            // Assert
+            npoiCell.Received().RemoveCellMergedRegion();
+        }
+
+        [Test]
+        public void RemoveCellMergedRegion_Always_ExecuteRemoveMergedRegion()
+        {
+            // Arrange
+            var colIndex = 0;
+            var rowIndex = 1;
+
+            var mergeRange = new CellRangeAddress(rowIndex, rowIndex, colIndex, 4);
+            npoiCell.Cell.IsMergedCell.Returns(true);
+            npoiCell.Cell.Sheet.NumMergedRegions.Returns(1);
+            npoiCell.Cell.Sheet.GetMergedRegion(Arg.Any<int>()).Returns(mergeRange);
+
+            npoiCell.Cell.ColumnIndex.Returns(colIndex);
+            npoiCell.Cell.RowIndex.Returns(rowIndex);
+
+            // Act
+            npoiCell.RemoveCellMergedRegion();
+
+            // Assert
+            npoiCell.Cell.Sheet.Received().RemoveMergedRegion(0);
         }
 
         [Test]
@@ -363,5 +399,31 @@
         }
 
         #endregion
+
+        [Test]
+        public void ColumnIndex_Always_ReturnNpoiCellColumnIndex()
+        {
+            // Arrange
+            npoiCell.Cell.ColumnIndex.Returns(10);
+
+            // Act
+            var actualColIndex = npoiCell.ColumnIndex;
+
+            // Assert
+            Assert.AreEqual(10, actualColIndex);
+        }
+
+        [Test]
+        public void RowIndex_Always_ReturnNpoiCellRowIndex()
+        {
+            // Arrange
+            npoiCell.Cell.RowIndex.Returns(11);
+
+            // Act
+            var actualRowIndex = npoiCell.RowIndex;
+
+            // Assert
+            Assert.AreEqual(11, actualRowIndex);
+        }
     }
 }

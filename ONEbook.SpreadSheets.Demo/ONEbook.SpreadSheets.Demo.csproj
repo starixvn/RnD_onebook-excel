@@ -73,6 +73,9 @@
     <None Include="ExcelTemplates\MergeBodyCells.xls">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="ExcelTemplates\MergedTotalRows.xls">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="ExcelTemplates\MultipleTotalRows.xls">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

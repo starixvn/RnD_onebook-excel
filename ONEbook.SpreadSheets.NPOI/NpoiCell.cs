@@ -82,6 +82,11 @@
 
             if (!npoiCell.Cell.IsMergedCell)
             {
+                if (Cell.IsMergedCell)
+                {
+                    RemoveCellMergedRegion();
+                }
+
                 return;
             }
 
@@ -108,6 +113,21 @@
                     Cell.ColumnIndex + sourceRange.LastColumn - sourceRange.FirstColumn);
 
                 Cell.Sheet.AddMergedRegion(newRange);
+            }
+        }
+
+        internal virtual void RemoveCellMergedRegion()
+        {
+            for (var regionIndex = 0; regionIndex < Cell.Sheet.NumMergedRegions; regionIndex++)
+            {
+                CellRangeAddress range = Cell.Sheet.GetMergedRegion(regionIndex);
+
+                if (range.FirstColumn == Cell.ColumnIndex
+                    && range.FirstRow == Cell.RowIndex)
+                {
+                    Cell.Sheet.RemoveMergedRegion(regionIndex);
+                    return;
+                }
             }
         }
 
