@@ -166,7 +166,7 @@
             }
             else if (value is IRichTextString)
             {
-                Cell.SetCellValue(Converter.To<IRichTextString>(value));
+                Cell.SetCellValue(value as IRichTextString);
             }
             else
             {
