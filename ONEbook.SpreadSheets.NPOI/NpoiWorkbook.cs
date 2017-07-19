@@ -30,7 +30,10 @@
 
         protected override void FillSheetName(int index, string name)
         {
-            Workbook.SetSheetName(index, name);
+            if (!string.IsNullOrWhiteSpace(name))
+            {
+                Workbook.SetSheetName(index, name);
+            }
         }
 
         protected override byte[] ToBytes()
