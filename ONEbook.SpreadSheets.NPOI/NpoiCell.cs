@@ -109,7 +109,10 @@
                     Cell.ColumnIndex,
                     Cell.ColumnIndex + sourceRange.LastColumn - sourceRange.FirstColumn);
 
-                Cell.Sheet.AddMergedRegion(newRange);
+                if (Cell.Sheet.MergedRegions == null || !Cell.Sheet.MergedRegions.Contains(newRange))
+                {
+                    Cell.Sheet.AddMergedRegion(newRange);
+                }
             }
         }
 
