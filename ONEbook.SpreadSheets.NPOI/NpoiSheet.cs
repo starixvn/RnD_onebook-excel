@@ -51,9 +51,7 @@
 
         public void RemoveRow(Row row)
         {
-            var npoiRow = row as NpoiRow;
-
-            if (npoiRow != null)
+            if (row is NpoiRow npoiRow)
             {
                 Sheet.RemoveRow(npoiRow.Row);
             }

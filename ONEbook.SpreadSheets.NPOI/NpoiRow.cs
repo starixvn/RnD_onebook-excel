@@ -37,9 +37,7 @@
                 cell.CopyFrom(sourceCell);
             }
 
-            var npoiRow = row as NpoiRow;
-
-            if (npoiRow == null)
+            if (!(row is NpoiRow npoiRow))
             {
                 throw new InvalidCastException("NPOI Target Row cannot be null");
             }

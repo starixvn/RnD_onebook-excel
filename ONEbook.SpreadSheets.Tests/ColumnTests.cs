@@ -6,7 +6,7 @@
     [TestFixture]
     public class ColumnTests
     {
-        private static object[] getColIndexTestCaseSource =
+        private static readonly object[] getColIndexTestCaseSource =
             {
                 new object[] { Column.A, 0 },
                 new object[] { Column.B, 1 },

@@ -625,7 +625,7 @@
         public void Header_Always_SetSpreadSheetHeader()
         {
             // Arrange
-            Func<string, string> headerMapping = (a) => a.ToString();
+            string headerMapping(string a) => a.ToString();
             workbook.SpreadSheet.Returns(Substitute.For<SpreadSheet<object>>());
 
             // Act

@@ -1,7 +1,6 @@
 ﻿namespace ONEbook.SpreadSheets.NPOI
 {
     using System;
-    using Fanex.Common;
     using global::NPOI.SS.UserModel;
     using global::NPOI.SS.Util;
 
@@ -73,9 +72,7 @@
 
         public virtual void CopyMergeInfoFrom(Cell cell)
         {
-            var npoiCell = cell as NpoiCell;
-
-            if (npoiCell == null)
+            if (!(cell is NpoiCell npoiCell))
             {
                 throw new InvalidCastException("NPOI Cell cannot be null");
             }

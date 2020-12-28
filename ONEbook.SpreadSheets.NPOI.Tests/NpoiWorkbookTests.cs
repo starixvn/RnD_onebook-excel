@@ -53,8 +53,10 @@
         public void ToBytes_Always_ReturnStreamBuffer()
         {
             // Arrange
-            var npoiWorkbookForTesting = new NpoiWorkbookForTesting();
-            npoiWorkbookForTesting.Workbook = workbook;
+            var npoiWorkbookForTesting = new NpoiWorkbookForTesting
+            {
+                Workbook = workbook
+            };
 
             // Acc
             var actualBuffer = npoiWorkbookForTesting.ToBytes();
