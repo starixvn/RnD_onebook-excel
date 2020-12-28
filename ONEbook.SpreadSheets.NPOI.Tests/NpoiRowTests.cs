@@ -13,7 +13,6 @@
         private IRow row;
         private IRow sourceRow;
         private NpoiRow npoiSourceRow;
-        private Cell sourceCell;
 
         [SetUp]
         public void SetUp()
@@ -22,7 +21,6 @@
             row = Substitute.For<IRow>();
             npoiRow = Substitute.ForPartsOf<NpoiRow>(row);
 
-            sourceCell = Substitute.For<Cell>();
             sourceRow = Substitute.For<IRow>();
             npoiSourceRow = Substitute.ForPartsOf<NpoiRow>(sourceRow);
         }
@@ -60,7 +58,7 @@
             npoiRow.CopyCellsFrom(npoiSourceRow);
 
             // Assert
-            Assert.AreEqual(npoiRow.Row.Height, 100);
+            Assert.AreEqual(100, npoiRow.Row.Height);
         }
 
         #endregion Copy Cells From Row
