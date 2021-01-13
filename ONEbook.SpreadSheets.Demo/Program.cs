@@ -9,7 +9,7 @@ namespace ONEbook.SpreadSheets.Demo
     using Models;
     using NPOI;
 
-    internal class Program
+    public class Program
     {
         private static void Main()
         {

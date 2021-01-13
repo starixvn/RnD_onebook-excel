@@ -10,7 +10,7 @@
             "request": "launch",
             "preLaunchTask": "build",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceFolder}/ONEbook.SpreadSheets.Demo/bin/Debug/net5.0/ONEbook.SpreadSheets.Demo.dll",
+            "program": "${workspaceFolder}/ONEbook.SpreadSheets.Demo/bin/Debug/netcoreapp2.1/ONEbook.SpreadSheets.Demo.dll",
             "args": [],
             "cwd": "${workspaceFolder}/ONEbook.SpreadSheets.Demo",
             // For more information about the 'console' field, see https://aka.ms/VSCode-CS-LaunchJson-Console

@@ -11,4 +11,22 @@
     <ProjectReference Include="..\ONEbook.SpreadSheets\ONEbook.SpreadSheets.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="ExcelTemplates\MergeBodyCells.xls">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="ExcelTemplates\MergedTotalRows.xls">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="ExcelTemplates\MultipleTotalRows.xls">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="ExcelTemplates\NoTotalRow.xls">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="ExcelTemplates\WinLossDetail.xls">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
