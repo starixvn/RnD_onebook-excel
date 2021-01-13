@@ -190,15 +190,15 @@ namespace ONEbook.SpreadSheets.Demo
             for (int i = 0; i < length; i++)
             {
                 dummyData.Add(new WinLossDetail(
-                    10 + i, 
-                    "name " + i, 
-                    1000 + i, 
-                    30000 + i, 
-                    20000 + i, 
-                    40 + i, 
-                    new NetWinLoss(200.23m + i, 4 + i), 
-                    new NetWinLoss(5 + i, 6 + i), 
-                    new NetWinLoss(7 + i, 8 + i), 
+                    10 + i,
+                    "name " + i,
+                    1000 + i,
+                    30000 + i,
+                    20000 + i,
+                    40 + i,
+                    new NetWinLoss(200.23m + i, 4 + i),
+                    new NetWinLoss(5 + i, 6 + i),
+                    new NetWinLoss(7 + i, 8 + i),
                     new NetWinLoss(80.23m + i, 9 + i)));
             }
 

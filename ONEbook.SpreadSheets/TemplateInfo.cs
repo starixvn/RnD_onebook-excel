@@ -94,7 +94,7 @@
             int bodyEndIndex = 6)
         {
             BodyStartIndex = bodyStartIndex - 1;
-            bodyEndIndex = bodyEndIndex - 1;
+            BodyEndIndex = bodyEndIndex - 1;
 
             return this;
         }

@@ -67,14 +67,14 @@
         public void LoadTemplateSheet_Always_ExecuteGetEvenRowTemplate()
         {
             // Arrange
-            templateInfo.Body(bodyStartIndex: 4, bodyEndIndex: 6);
+            templateInfo.Body(bodyStartIndex: 3, bodyEndIndex: 6);
             workbook.GetSheetAt(Arg.Any<int>()).Returns(sheet);
 
             // Act
             workbook.LoadTemplateSheet();
 
             // Assert
-            sheet.Received().GetRow(templateInfo.BodyStartIndex + 1);
+            sheet.Received().GetRow(templateInfo.BodyStartIndex);
         }
 
         [Test]
@@ -89,7 +89,7 @@
             workbook.LoadTemplateSheet();
 
             // Assert
-            Assert.AreEqual(2, sheet.FooterRowsTemplate.Count());
+            Assert.AreEqual(1, sheet.FooterRowsTemplate.Count());
         }
 
         #endregion Load templates
