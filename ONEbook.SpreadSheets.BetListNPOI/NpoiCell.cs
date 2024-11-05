@@ -1,7 +1,6 @@
 ﻿namespace ONEbook.SpreadSheets.BetListNPOI
 {
-    using System;
-    using Fanex.Common;
+    using System;    
     using global::BetListNPOI.SS.UserModel;
     using global::BetListNPOI.SS.Util;
 
